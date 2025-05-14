@@ -5,10 +5,10 @@ const app = express();
 
 // Configurar motor de vistas
 app.set('view engine', 'pug');
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'vistas')); // <-- ESTA LÍNEA ES LA CORRECTA
 
 // Carpeta pública (estilos, imágenes, etc.)
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'publico')));
 
 // Ruta principal
 app.get('/', (req, res) => {
