@@ -8,3 +8,10 @@ Este módulo permite simular el flujo de internación de pacientes en un hospita
 - Asignación de habitaciones y camas disponibles.
 - Evaluación inicial por enfermería.
 - Gestión de cancelación o modificación de admisiones.
+
+Base de Datos:
+
+Para crear la base de datos y sus tablas, ejecutá en MySQL:
+
+```sql
+SOURCE backup.sql;
