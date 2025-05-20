@@ -1,6 +1,6 @@
 const express = require('express');
 const router  = express.Router();
-const db      = require('../models/db');  
+const db      = require('../modelos/db');  
 
 
 router.get('/admitir', (req, res) => {
