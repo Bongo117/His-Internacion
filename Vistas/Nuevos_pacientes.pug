@@ -1,0 +1,25 @@
+extends layout
+
+block content
+  h1= titulo
+  form(method="POST", action="/pacientes/nuevo")
+    .mb-3
+      label(for="nombre") Nombre
+      input.form-control(type="text", name="nombre", required)
+    .mb-3
+      label(for="apellido") Apellido
+      input.form-control(type="text", name="apellido", required)
+    .mb-3
+      label(for="dni") DNI
+      input.form-control(type="text", name="dni", required)
+    .mb-3
+      label(for="fecha_nacimiento") Fecha de nacimiento
+      input.form-control(type="date", name="fecha_nacimiento")
+    .mb-3
+      label(for="sexo") Sexo
+      select.form-control(name="sexo")
+        option(value="M") Masculino
+        option(value="F") Femenino
+        option(value="X") Otro
+    button.btn.btn-primary(type="submit") Crear paciente
+    a.btn.btn-secondary(href="/") Volver
