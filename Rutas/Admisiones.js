@@ -24,18 +24,74 @@ router.get('/admitir', (req, res) => {
 router.post('/admitir', (req, res) => {
   const { id_paciente, fecha_admision, motivo, tipo_ingreso, id_cama_asignada } = req.body;
 
-  const sql = `
-    INSERT INTO admision
-      (id_paciente, fecha_admision, motivo, tipo_ingreso, id_cama_asignada)
-    VALUES (?, ?, ?, ?, ?)
-  `;
-  db.query(sql, [id_paciente, fecha_admision, motivo, tipo_ingreso, id_cama_asignada], (err, resultado) => {
-    if (err) {
-      console.error('❌ Error al registrar admisión:', err);
-      return res.status(500).send('Error al registrar la admisión');
+  
+  const sqlCama = 'SELECT * FROM cama WHERE id_cama = ? AND estado = "libre"';
+  db.query(sqlCama, [id_cama_asignada], (err, resultadoCama) => {
+    if (err || resultadoCama.length === 0) {
+      return res.send('❌ La cama seleccionada no está disponible.');
     }
-    res.send('Admisión registrada correctamente ✅');
+
+    
+    const sqlSexoPaciente = 'SELECT sexo FROM paciente WHERE id_paciente = ?';
+    db.query(sqlSexoPaciente, [id_paciente], (err, resultadoPaciente) => {
+      if (err || resultadoPaciente.length === 0) {
+        return res.send('❌ No se pudo obtener el sexo del paciente.');
+      }
+
+      const sexoPaciente = resultadoPaciente[0].sexo;
+
+      
+      const sqlHabitacion = `
+        SELECT h.id_habitacion
+        FROM cama c
+        JOIN habitacion h ON c.id_habitacion = h.id_habitacion
+        WHERE c.id_cama = ?
+      `;
+      db.query(sqlHabitacion, [id_cama_asignada], (err, resultadoHab) => {
+        if (err || resultadoHab.length === 0) {
+          return res.send('❌ No se pudo obtener la habitación.');
+        }
+
+        const idHabitacion = resultadoHab[0].id_habitacion;
+
+        
+        const sqlSexos = `
+          SELECT p.sexo
+          FROM admision a
+          JOIN paciente p ON a.id_paciente = p.id_paciente
+          JOIN cama c ON a.id_cama_asignada = c.id_cama
+          WHERE c.id_habitacion = ? AND a.estado = 'activa'
+        `;
+        db.query(sqlSexos, [idHabitacion], (err, sexosOcupantes) => {
+          if (err) return res.send('❌ Error al verificar sexo en habitación.');
+
+          const conflicto = sexosOcupantes.some(s => s.sexo !== sexoPaciente);
+          if (conflicto) {
+            return res.send('⚠️ Conflicto de sexo en la habitación. No se puede asignar.');
+          }
+
+          
+          const sqlInsert = `
+            INSERT INTO admision
+            (id_paciente, fecha_admision, motivo, tipo_ingreso, id_cama_asignada)
+            VALUES (?, ?, ?, ?, ?)
+          `;
+          db.query(sqlInsert, [id_paciente, fecha_admision, motivo, tipo_ingreso, id_cama_asignada], (err, result) => {
+            if (err) {
+              console.error('❌ Error al registrar admisión:', err);
+              return res.send('❌ Error al registrar la admisión');
+            }
+
+           
+            db.query('UPDATE cama SET estado = "ocupada" WHERE id_cama = ?', [id_cama_asignada]);
+
+            res.send('✅ Admisión registrada correctamente');
+          });
+        });
+      });
+    });
   });
 });
+
 
 module.exports = router;
