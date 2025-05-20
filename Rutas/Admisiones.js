@@ -4,7 +4,20 @@ const db      = require('../models/db');
 
 
 router.get('/admitir', (req, res) => {
-  res.render('admitir', { titulo: 'Admitir Paciente' });
+  const queryPacientes = 'SELECT id_paciente, nombre, apellido FROM paciente';
+  const queryCamas = "SELECT id_cama FROM cama WHERE estado = 'libre'";
+
+  db.query(queryPacientes, (err, pacientes) => {
+    if (err) return res.send('Error al obtener pacientes');
+    db.query(queryCamas, (err, camas) => {
+      if (err) return res.send('Error al obtener camas');
+      res.render('admitir', {
+        titulo: 'Admitir Paciente',
+        pacientes,
+        camas
+      });
+    });
+  });
 });
 
 

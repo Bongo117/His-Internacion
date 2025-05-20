@@ -9,4 +9,40 @@ html(lang="es")
     .container.mt-5
       h1.text-success.mb-4= titulo
       p Aquí podrás completar la admisión de un paciente.
+
+      form(method="POST", action="/admitir")
+  .mb-3
+    label.form-label(for="id_paciente") Paciente
+    select.form-control(name="id_paciente", required)
+      option(value="") Seleccionar...
+      each paciente in pacientes
+        option(value=paciente.id_paciente)= paciente.nombre + ' ' + paciente.apellido
+
+  .mb-3
+    label.form-label(for="fecha_admision") Fecha de admisión
+    input.form-control(type="date", name="fecha_admision", required)
+
+  .mb-3
+    label.form-label(for="motivo") Motivo
+    textarea.form-control(name="motivo", rows="3", required)
+
+  .mb-3
+    label.form-label(for="tipo_ingreso") Tipo de ingreso
+    select.form-control(name="tipo_ingreso", required)
+      option(value="") Seleccionar...
+      option(value="derivado") Derivado
+      option(value="emergencia") Emergencia
+      option(value="quirurgico") Quirúrgico
+
+  .mb-3
+    label.form-label(for="id_cama_asignada") Cama disponible
+    select.form-control(name="id_cama_asignada", required)
+      option(value="") Seleccionar...
+      each cama in camas
+        option(value=cama.id_cama)= 'Cama ID ' + cama.id_cama
+
+  button.btn.btn-primary(type="submit") Registrar admisión
+
+
+      br
       a.btn.btn-secondary(href="/") Volver al inicio
