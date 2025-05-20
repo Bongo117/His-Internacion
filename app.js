@@ -1,5 +1,5 @@
 const rutaAdmisiones = require('./Rutas/Admisiones');
-
+const rutaPacientes   = require('./Rutas/Pacientes');
 const express = require('express');
 const path = require('path');
 
@@ -24,5 +24,6 @@ app.listen(PORT, () => {
 });
 
 app.use('/', rutaAdmisiones);
+app.use('/', rutaPacientes);
 
 app.use(express.urlencoded({ extended: false }));
