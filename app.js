@@ -1,16 +1,17 @@
-const rutaAdmisiones = require('./Rutas/Admisiones');
-const rutaPacientes   = require('./Rutas/Pacientes');
 const express = require('express');
 const path = require('path');
+const rutaAdmisiones = require('./Rutas/Admisiones');
+const rutaPacientes  = require('./Rutas/Pacientes');
 
 const app = express();
 
 
 app.set('view engine', 'pug');
-app.set('views', path.join(__dirname, 'vistas')); 
+app.set('views', path.join(__dirname, 'vistas'));
 
 
 app.use(express.static(path.join(__dirname, 'publico')));
+app.use(express.urlencoded({ extended: false })); 
 
 
 app.get('/', (req, res) => {
@@ -18,12 +19,11 @@ app.get('/', (req, res) => {
 });
 
 
+app.use('/', rutaAdmisiones);
+app.use('/', rutaPacientes);
+
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor funcionando en http://localhost:${PORT}`);
 });
-
-app.use('/', rutaAdmisiones);
-app.use('/', rutaPacientes);
-
-app.use(express.urlencoded({ extended: false }));
