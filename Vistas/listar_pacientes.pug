@@ -1,19 +1,19 @@
-extends layout
-
+extends layout  
 block content
   h1= titulo
-  a.btn.btn-success(href="/pacientes/nuevo") Nuevo Paciente
-  table.table.table-striped.mt-3
+  table
     thead
       tr
-        th ID
         th Nombre
         th Apellido
         th DNI
+        th Fecha Nacimiento
+        th Sexo
     tbody
-      each p in pacientes
+      each paciente in pacientes
         tr
-          td= p.id_paciente
-          td= p.nombre
-          td= p.apellido
-          td= p.dni
+          td= paciente.nombre
+          td= paciente.apellido
+          td= paciente.dni
+          td= paciente.fecha_nacimiento
+          td= paciente.sexo
