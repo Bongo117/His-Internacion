@@ -12,6 +12,9 @@ block content
         each paciente in pacientes
           option(value=paciente.id_paciente)= paciente.nombre + ' ' + paciente.apellido
 
+      
+      a.btn.btn-link.mt-1(href="/pacientes/nuevo") + Crear nuevo paciente
+
     .mb-3
       label.form-label(for="fecha_admision") Fecha de admisión
       input.form-control(type="date", name="fecha_admision", required)
