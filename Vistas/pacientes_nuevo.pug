@@ -6,20 +6,46 @@ block content
     .mb-3
       label(for="nombre") Nombre
       input.form-control(type="text", name="nombre", required)
+
     .mb-3
       label(for="apellido") Apellido
       input.form-control(type="text", name="apellido", required)
+
     .mb-3
       label(for="dni") DNI
       input.form-control(type="text", name="dni", required)
+
     .mb-3
       label(for="fecha_nacimiento") Fecha de nacimiento
-      input.form-control(type="date", name="fecha_nacimiento")
+      input.form-control(type="date", name="fecha_nacimiento", required)
+
     .mb-3
       label(for="sexo") Sexo
-      select.form-control(name="sexo")
+      select.form-control(name="sexo", required)
+        option(value="") Seleccionar...
         option(value="M") Masculino
         option(value="F") Femenino
         option(value="X") Otro
+
+    .mb-3
+      label(for="telefono") Teléfono
+      input.form-control(type="text", name="telefono", required)
+
+    .mb-3
+      label(for="direccion") Dirección
+      input.form-control(type="text", name="direccion", required)
+
+    .mb-3
+      label(for="contacto_emergencia") Contacto de emergencia
+      input.form-control(type="text", name="contacto_emergencia", required)
+
+    .mb-3
+      label(for="obra_social") Obra social
+      input.form-control(type="text", name="obra_social", required)
+
+    .mb-3
+      label(for="nro_afiliado") Nro. de afiliado
+      input.form-control(type="text", name="nro_afiliado", required)
+
     button.btn.btn-primary(type="submit") Crear paciente
     a.btn.btn-secondary(href="/") Volver

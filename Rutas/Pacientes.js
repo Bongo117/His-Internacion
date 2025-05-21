@@ -9,18 +9,30 @@ router.get('/pacientes/nuevo', (req, res) => {
 
 
 router.post('/pacientes/nuevo', (req, res) => {
-  const { nombre, apellido, dni, fecha_nacimiento, sexo } = req.body;
+  const {
+    nombre, apellido, dni, fecha_nacimiento,
+    sexo, telefono, direccion, contacto_emergencia,
+    obra_social, nro_afiliado
+  } = req.body;
+
   const sql = `
     INSERT INTO paciente
-      (nombre, apellido, dni, fecha_nacimiento, sexo)
-    VALUES (?, ?, ?, ?, ?)
+    (nombre, apellido, dni, fecha_nacimiento, sexo, telefono, direccion, contacto_emergencia, obra_social, nro_afiliado)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
-  db.query(sql, [nombre, apellido, dni, fecha_nacimiento, sexo], (err) => {
+
+  const valores = [
+    nombre, apellido, dni, fecha_nacimiento,
+    sexo, telefono, direccion, contacto_emergencia,
+    obra_social, nro_afiliado
+  ];
+
+  db.query(sql, valores, (err) => {
     if (err) {
-      console.error('Error al crear paciente:', err);
-      return res.send('Error al crear paciente');
+      console.error('❌ Error al crear paciente:', err);
+      return res.send('Error al crear paciente.');
     }
-    res.redirect('/pacientes');  
+    res.redirect('/pacientes');
   });
 });
 
