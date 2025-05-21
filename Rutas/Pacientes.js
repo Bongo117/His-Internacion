@@ -28,7 +28,7 @@ router.post('/pacientes/nuevo', (req, res) => {
 router.get('/pacientes', (req, res) => {
   db.query('SELECT * FROM paciente', (err, pacientes) => {
     if (err) return res.send('Error al listar pacientes');
-    res.render('pacientes_listar', { titulo: 'Listado de Pacientes', pacientes });
+    res.render('listar_pacientes', { titulo: 'Listado de Pacientes', pacientes });
   });
 });
 
