@@ -2,18 +2,34 @@ extends layout
 
 block content
   h1.text-success.mb-4= titulo
-  p Aquí podrás completar la admisión de un paciente.
+  p Acá podes completar la admisión de un paciente.
 
   form(method="POST", action="/admitir")
     .mb-3
       label.form-label(for="id_paciente") Paciente
-      select.form-control(name="id_paciente", required)
+      select.form-control(id="id_paciente" name="id_paciente" required onchange="mostrarDatosPaciente()")
         option(value="") Seleccionar...
         each paciente in pacientes
-          option(value=paciente.id_paciente)= paciente.nombre + ' ' + paciente.apellido
+          option(
+            value=paciente.id_paciente 
+            data-dni=paciente.dni 
+            data-fnac=paciente.fecha_nacimiento 
+            data-tel=paciente.telefono 
+            data-os=paciente.obra_social 
+            data-naf=paciente.nro_afiliado
+          )= paciente.nombre + ' ' + paciente.apellido
 
-      
-      a.btn.btn-link.mt-1(href="/pacientes/nuevo") + Crear nuevo paciente
+      a.btn.btn-link.mt-2(href="/pacientes/nuevo") + Crear nuevo paciente
+
+    #datosPaciente.mt-3(style="display: none;")
+      h5.text-primary Datos del paciente:
+      ul.list-group
+        li.list-group-item ID: #[span#dp_id]
+        li.list-group-item DNI: #[span#dp_dni]
+        li.list-group-item Fecha de nacimiento: #[span#dp_fnac]
+        li.list-group-item Teléfono: #[span#dp_tel]
+        li.list-group-item Obra Social: #[span#dp_os]
+        li.list-group-item Nº Afiliado: #[span#dp_naf]
 
     .mb-3
       label.form-label(for="fecha_admision") Fecha de admisión
@@ -42,3 +58,23 @@ block content
 
   br
   a.btn.btn-secondary(href="/") Volver al inicio
+
+  script.
+    function mostrarDatosPaciente() {
+      const select = document.getElementById('id_paciente');
+      const selected = select.options[select.selectedIndex];
+
+      if (selected.value === '') {
+        document.getElementById('datosPaciente').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('dp_id').textContent   = selected.value;
+      document.getElementById('dp_dni').textContent  = selected.dataset.dni || '-';
+      document.getElementById('dp_fnac').textContent = selected.dataset.fnac || '-';
+      document.getElementById('dp_tel').textContent  = selected.dataset.tel || '-';
+      document.getElementById('dp_os').textContent   = selected.dataset.os || '-';
+      document.getElementById('dp_naf').textContent  = selected.dataset.naf || '-';
+
+      document.getElementById('datosPaciente').style.display = 'block';
+    }
