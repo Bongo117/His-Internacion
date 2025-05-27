@@ -1,7 +1,9 @@
-extends layout  
+extends layout
+
 block content
   h1= titulo
-  table
+
+  table.table.table-striped
     thead
       tr
         th Nombre
@@ -9,11 +11,24 @@ block content
         th DNI
         th Fecha Nacimiento
         th Sexo
+        th Teléfono
+        th Dirección
+        th Contacto Emergencia
+        th Obra Social
+        th Nº Afiliado
+
     tbody
       each paciente in pacientes
         tr
           td= paciente.nombre
           td= paciente.apellido
           td= paciente.dni
-          td= paciente.fecha_nacimiento
+          td= paciente.fecha_nacimiento.toDateString ? paciente.fecha_nacimiento.toDateString() : paciente.fecha_nacimiento
           td= paciente.sexo
+          td= paciente.telefono
+          td= paciente.direccion
+          td= paciente.contacto_emergencia
+          td= paciente.obra_social
+          td= paciente.nro_afiliado
+
+  a.btn.btn-primary.mt-3(href="/pacientes/nuevo") + Agregar Paciente
