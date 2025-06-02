@@ -1,0 +1,51 @@
+extends layout
+
+block content
+  h1= titulo
+
+  form(method="POST", action=`/pacientes/editar/${paciente.id_paciente}`)
+    .mb-3
+      label(for="nombre") Nombre
+      input.form-control(type="text", name="nombre", required, value=paciente.nombre)
+
+    .mb-3
+      label(for="apellido") Apellido
+      input.form-control(type="text", name="apellido", required, value=paciente.apellido)
+
+    .mb-3
+      label(for="dni") DNI
+      input.form-control(type="text", name="dni", required, value=paciente.dni)
+
+    .mb-3
+      label(for="fecha_nacimiento") Fecha de nacimiento
+      input.form-control(type="date", name="fecha_nacimiento", required, value=paciente.fecha_nacimiento.toISOString().split('T')[0])
+
+    .mb-3
+      label(for="sexo") Sexo
+      select.form-control(name="sexo", required)
+        option(value="M", selected=paciente.sexo === 'M') Masculino
+        option(value="F", selected=paciente.sexo === 'F') Femenino
+        option(value="X", selected=paciente.sexo === 'X') Otro
+
+    .mb-3
+      label(for="telefono") Teléfono
+      input.form-control(type="text", name="telefono", required, value=paciente.telefono)
+
+    .mb-3
+      label(for="direccion") Dirección
+      input.form-control(type="text", name="direccion", required, value=paciente.direccion)
+
+    .mb-3
+      label(for="contacto_emergencia") Contacto de emergencia
+      input.form-control(type="text", name="contacto_emergencia", required, value=paciente.contacto_emergencia)
+
+    .mb-3
+      label(for="obra_social") Obra social
+      input.form-control(type="text", name="obra_social", required, value=paciente.obra_social)
+
+    .mb-3
+      label(for="nro_afiliado") Nro. de afiliado
+      input.form-control(type="text", name="nro_afiliado", required, value=paciente.nro_afiliado)
+
+    button.btn.btn-primary(type="submit") Guardar cambios
+    a.btn.btn-secondary(href="/pacientes") Volver al listado

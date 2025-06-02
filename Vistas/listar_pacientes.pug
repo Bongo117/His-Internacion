@@ -16,6 +16,7 @@ block content
         th Contacto Emergencia
         th Obra Social
         th Nº Afiliado
+        th Acciones  
 
     tbody
       each paciente in pacientes
@@ -30,5 +31,9 @@ block content
           td= paciente.contacto_emergencia
           td= paciente.obra_social
           td= paciente.nro_afiliado
+          td  // ✅ Celda para los botones
+            a.btn.btn-warning.btn-sm(href=`/pacientes/editar/${paciente.id_paciente}`) Editar
+            form(method="POST", action=`/pacientes/eliminar/${paciente.id_paciente}`, style="display:inline;", onsubmit="return confirm('¿Confirma eliminar?');")
+              button.btn.btn-danger.btn-sm(type="submit") Eliminar
 
   a.btn.btn-primary.mt-3(href="/pacientes/nuevo") + Agregar Paciente
