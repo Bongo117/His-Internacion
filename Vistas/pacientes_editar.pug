@@ -6,46 +6,100 @@ block content
   form(method="POST", action=`/pacientes/editar/${paciente.id_paciente}`)
     .mb-3
       label(for="nombre") Nombre
-      input.form-control(type="text", name="nombre", required, value=paciente.nombre)
+      input.form-control(
+        type="text",
+        name="nombre",
+        required,
+        pattern="[A-Za-z\s]+",
+        title="Solo letras",
+        value=paciente.nombre
+      )
 
     .mb-3
       label(for="apellido") Apellido
-      input.form-control(type="text", name="apellido", required, value=paciente.apellido)
+      input.form-control(
+        type="text",
+        name="apellido",
+        required,
+        pattern="[A-Za-z\s]+",
+        title="Solo letras",
+        value=paciente.apellido
+      )
 
     .mb-3
       label(for="dni") DNI
-      input.form-control(type="text", name="dni", required, value=paciente.dni)
+      input.form-control(
+        type="text",
+        name="dni",
+        required,
+        pattern="[0-9]+",
+        title="Solo números",
+        value=paciente.dni
+      )
 
     .mb-3
       label(for="fecha_nacimiento") Fecha de nacimiento
-      input.form-control(type="date", name="fecha_nacimiento", required, value=paciente.fecha_nacimiento.toISOString().split('T')[0])
+      input.form-control(
+        type="date",
+        name="fecha_nacimiento",
+        required,
+        value=paciente.fecha_nacimiento.toISOString().split('T')[0]
+      )
 
     .mb-3
       label(for="sexo") Sexo
       select.form-control(name="sexo", required)
+        option(value="") Seleccionar...
         option(value="M", selected=paciente.sexo === 'M') Masculino
         option(value="F", selected=paciente.sexo === 'F') Femenino
         option(value="X", selected=paciente.sexo === 'X') Otro
 
     .mb-3
       label(for="telefono") Teléfono
-      input.form-control(type="text", name="telefono", required, value=paciente.telefono)
+      input.form-control(
+        type="text",
+        name="telefono",
+        required,
+        pattern="[0-9]{8,}",
+        title="Al menos 8 dígitos",
+        value=paciente.telefono
+      )
 
     .mb-3
       label(for="direccion") Dirección
-      input.form-control(type="text", name="direccion", required, value=paciente.direccion)
+      input.form-control(
+        type="text",
+        name="direccion",
+        required,
+        value=paciente.direccion
+      )
 
     .mb-3
       label(for="contacto_emergencia") Contacto de emergencia
-      input.form-control(type="text", name="contacto_emergencia", required, value=paciente.contacto_emergencia)
+      input.form-control(
+        type="text",
+        name="contacto_emergencia",
+        required,
+        value=paciente.contacto_emergencia
+      )
 
     .mb-3
       label(for="obra_social") Obra social
-      input.form-control(type="text", name="obra_social", required, value=paciente.obra_social)
+      input.form-control(
+        type="text",
+        name="obra_social",
+        required,
+        value=paciente.obra_social
+      )
 
     .mb-3
       label(for="nro_afiliado") Nro. de afiliado
-      input.form-control(type="text", name="nro_afiliado", required, value=paciente.nro_afiliado)
+      input.form-control(
+        type="text",
+        name="nro_afiliado",
+        required,
+        value=paciente.nro_afiliado
+      )
 
     button.btn.btn-primary(type="submit") Guardar cambios
     a.btn.btn-secondary(href="/pacientes") Volver al listado

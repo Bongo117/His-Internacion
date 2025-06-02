@@ -5,15 +5,33 @@ block content
   form(method="POST", action="/pacientes/nuevo")
     .mb-3
       label(for="nombre") Nombre
-      input.form-control(type="text", name="nombre", required)
+      input.form-control(
+        type="text",
+        name="nombre",
+        required,
+        pattern="[A-Za-z\s]+",
+        title="Solo letras"
+      )
 
     .mb-3
       label(for="apellido") Apellido
-      input.form-control(type="text", name="apellido", required)
+      input.form-control(
+        type="text",
+        name="apellido",
+        required,
+        pattern="[A-Za-z\s]+",
+        title="Solo letras"
+      )
 
     .mb-3
       label(for="dni") DNI
-      input.form-control(type="text", name="dni", required)
+      input.form-control(
+        type="text",
+        name="dni",
+        required,
+        pattern="[0-9]+",
+        title="Solo números"
+      )
 
     .mb-3
       label(for="fecha_nacimiento") Fecha de nacimiento
@@ -29,7 +47,13 @@ block content
 
     .mb-3
       label(for="telefono") Teléfono
-      input.form-control(type="text", name="telefono", required)
+      input.form-control(
+        type="text",
+        name="telefono",
+        required,
+        pattern="[0-9]{8,}",
+        title="Al menos 8 dígitos"
+      )
 
     .mb-3
       label(for="direccion") Dirección
