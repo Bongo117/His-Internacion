@@ -2,21 +2,21 @@ extends layout
 
 block content
   h1.text-success.mb-4= titulo
-  p Acá podes completar la admisión de un paciente.
+  p Aquí podrás completar la admisión de un paciente.
 
   form(method="POST", action="/admitir")
     .mb-3
       label.form-label(for="id_paciente") Paciente
-      select.form-control(id="id_paciente" name="id_paciente" required onchange="mostrarDatosPaciente()")
+      select.form-control(id="id_paciente", name="id_paciente", required, onchange="mostrarDatosPaciente()")
         option(value="") Seleccionar...
         each paciente in pacientes
           option(
             value=paciente.id_paciente 
-            data-dni=paciente.dni 
-            data-fnac=paciente.fecha_nacimiento 
-            data-tel=paciente.telefono 
-            data-os=paciente.obra_social 
-            data-naf=paciente.nro_afiliado
+            data-dni=paciente.dni || '' 
+            data-fnac=paciente.fecha_nacimiento || '' 
+            data-tel=paciente.telefono || '' 
+            data-os=paciente.obra_social || '' 
+            data-naf=paciente.nro_afiliado || ''
           )= paciente.nombre + ' ' + paciente.apellido
 
       a.btn.btn-link.mt-2(href="/pacientes/nuevo") + Crear nuevo paciente
@@ -37,7 +37,7 @@ block content
 
     .mb-3
       label.form-label(for="motivo") Motivo
-      textarea.form-control(name="motivo", rows="3", required)
+      textarea.form-control(name="motivo", rows="3", required, pattern=".{5,}", title="Al menos 5 caracteres")
 
     .mb-3
       label.form-label(for="tipo_ingreso") Tipo de ingreso
