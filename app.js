@@ -2,6 +2,8 @@ const express = require('express');
 const path = require('path');
 const rutaAdmisiones = require('./Rutas/Admisiones');
 const rutaPacientes  = require('./Rutas/Pacientes');
+const rutaCamas = require('./Rutas/Camas');
+
 
 const app = express();
 
@@ -21,7 +23,7 @@ app.get('/', (req, res) => {
 
 app.use('/', rutaAdmisiones);
 app.use('/', rutaPacientes);
-
+app.use('/', rutaCamas);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

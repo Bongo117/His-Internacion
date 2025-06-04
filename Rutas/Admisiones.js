@@ -18,7 +18,7 @@ router.get("/admitir", (req, res) => {
     });
   });
 });
-
+r
 router.post("/admitir", (req, res) => {
   const {
     id_paciente,
@@ -42,6 +42,7 @@ router.post("/admitir", (req, res) => {
     if (resultado.length > 0) {
       return res.send("⚠️ Este paciente ya tiene una admisión activa.");
     }
+
     const sqlCama = 'SELECT * FROM cama WHERE id_cama = ? AND estado = "libre"';
     db.query(sqlCama, [id_cama_asignada], (err, resultadoCama) => {
       if (err || resultadoCama.length === 0) {
@@ -57,11 +58,11 @@ router.post("/admitir", (req, res) => {
         const sexoPaciente = resultadoPaciente[0].sexo;
 
         const sqlHabitacion = `
-        SELECT h.id_habitacion
-        FROM cama c
-        JOIN habitacion h ON c.id_habitacion = h.id_habitacion
-        WHERE c.id_cama = ?
-      `;
+          SELECT h.id_habitacion
+          FROM cama c
+          JOIN habitacion h ON c.id_habitacion = h.id_habitacion
+          WHERE c.id_cama = ?
+        `;
         db.query(sqlHabitacion, [id_cama_asignada], (err, resultadoHab) => {
           if (err || resultadoHab.length === 0) {
             return res.send("❌ No se pudo obtener la habitación.");
@@ -70,12 +71,12 @@ router.post("/admitir", (req, res) => {
           const idHabitacion = resultadoHab[0].id_habitacion;
 
           const sqlSexos = `
-          SELECT p.sexo
-          FROM admision a
-          JOIN paciente p ON a.id_paciente = p.id_paciente
-          JOIN cama c ON a.id_cama_asignada = c.id_cama
-          WHERE c.id_habitacion = ? AND a.estado = 'activa'
-        `;
+            SELECT p.sexo
+            FROM admision a
+            JOIN paciente p ON a.id_paciente = p.id_paciente
+            JOIN cama c ON a.id_cama_asignada = c.id_cama
+            WHERE c.id_habitacion = ? AND a.estado = 'activa'
+          `;
           db.query(sqlSexos, [idHabitacion], (err, sexosOcupantes) => {
             if (err)
               return res.send("❌ Error al verificar sexo en habitación.");
@@ -90,10 +91,10 @@ router.post("/admitir", (req, res) => {
             }
 
             const sqlInsert = `
-            INSERT INTO admision
-            (id_paciente, fecha_admision, motivo, tipo_ingreso, id_cama_asignada)
-            VALUES (?, ?, ?, ?, ?)
-          `;
+              INSERT INTO admision
+              (id_paciente, fecha_admision, motivo, tipo_ingreso, id_cama_asignada)
+              VALUES (?, ?, ?, ?, ?)
+            `;
             db.query(
               sqlInsert,
               [
@@ -103,7 +104,7 @@ router.post("/admitir", (req, res) => {
                 tipo_ingreso,
                 id_cama_asignada,
               ],
-              (err, result) => {
+              (err) => {
                 if (err) {
                   console.error("❌ Error al registrar admisión:", err);
                   return res.send("❌ Error al registrar la admisión");
@@ -114,7 +115,7 @@ router.post("/admitir", (req, res) => {
                   [id_cama_asignada]
                 );
 
-                res.send("✅ Admisión registrada correctamente");
+                res.redirect('/admisiones');
               }
             );
           });
@@ -123,4 +124,28 @@ router.post("/admitir", (req, res) => {
     });
   });
 });
+
+
+router.get("/admisiones", (req, res) => {
+  const sql = `
+    SELECT a.id_admision, p.nombre, p.apellido, a.fecha_admision, a.motivo, a.tipo_ingreso, a.estado, c.numero AS cama_numero, h.numero AS habitacion_numero
+    FROM admision a
+    JOIN paciente p ON a.id_paciente = p.id_paciente
+    JOIN cama c ON a.id_cama_asignada = c.id_cama
+    JOIN habitacion h ON c.id_habitacion = h.id_habitacion
+    ORDER BY a.fecha_admision DESC
+  `;
+
+  db.query(sql, (err, admisiones) => {
+    if (err) {
+      console.error("❌ Error al obtener admisiones:", err);
+      return res.send("Error al listar admisiones.");
+    }
+    res.render("listar_admisiones", {
+      titulo: "Listado de Admisiones",
+      admisiones,
+    });
+  });
+});
+
 module.exports = router;

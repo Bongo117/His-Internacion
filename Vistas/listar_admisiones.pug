@@ -1,0 +1,32 @@
+extends layout
+
+block content
+  h1= titulo
+
+  table.table.table-striped
+    thead
+      tr
+        th Paciente
+        th Fecha de Admisión
+        th Motivo
+        th Tipo de Ingreso
+        th Cama
+        th Habitación
+        th Estado
+        th Acciones
+    tbody
+      each admision in admisiones
+        tr
+          td= admision.nombre + ' ' + admision.apellido
+          td= admision.fecha_admision.toISOString ? admision.fecha_admision.toISOString().split('T')[0] : admision.fecha_admision
+          td= admision.motivo
+          td= admision.tipo_ingreso
+          td= admision.cama_numero
+          td= admision.habitacion_numero
+          td= admision.estado
+          td
+            if admision.estado === 'activa'
+              form(method="POST", action=`/admisiones/finalizar/${admision.id_admision}`, style="display:inline;")
+                button.btn.btn-danger.btn-sm(type="submit", onclick="return confirm('¿Finalizar admisión?');") Finalizar
+
+  a.btn.btn-secondary.mt-3(href="/") Volver al inicio

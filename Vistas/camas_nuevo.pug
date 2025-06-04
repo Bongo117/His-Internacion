@@ -1,0 +1,19 @@
+extends layout
+
+block content
+  h1= titulo
+
+  form(method="POST", action="/camas/nuevo")
+    .mb-3
+      label(for="id_habitacion") Habitación
+      select.form-control(name="id_habitacion", required)
+        option(value="") Seleccionar...
+        each habitacion in habitaciones
+          option(value=habitacion.id_habitacion)= 'Hab ' + habitacion.numero
+
+    .mb-3
+      label(for="numero") Número de cama
+      input.form-control(type="number", name="numero", required, min="1")
+
+    button.btn.btn-primary(type="submit") Crear cama
+    a.btn.btn-secondary(href="/camas") Volver
