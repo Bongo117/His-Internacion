@@ -3,17 +3,23 @@ extends layout
 block content
   h1= titulo
 
-  form(method="POST", action=`/pacientes/editar/${paciente.id_paciente}`)
+  form(
+    method="POST",
+    action=`/pacientes/editar/${paciente.id_paciente}`,
+    id="formPaciente",
+    novalidate
+  )
     .mb-3
       label(for="nombre") Nombre
       input.form-control(
         type="text",
         name="nombre",
         required,
-        pattern="[A-Za-z\s]+",
-        title="Solo letras",
+        pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ ]+",
+        title="Solo letras y espacios",
         value=paciente.nombre
       )
+      small.text-danger#nombreError
 
     .mb-3
       label(for="apellido") Apellido
@@ -21,10 +27,11 @@ block content
         type="text",
         name="apellido",
         required,
-        pattern="[A-Za-z\s]+",
-        title="Solo letras",
+        pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ ]+",
+        title="Solo letras y espacios",
         value=paciente.apellido
       )
+      small.text-danger#apellidoError
 
     .mb-3
       label(for="dni") DNI
@@ -36,6 +43,7 @@ block content
         title="Solo números",
         value=paciente.dni
       )
+      small.text-danger#dniError
 
     .mb-3
       label(for="fecha_nacimiento") Fecha de nacimiento
@@ -45,6 +53,7 @@ block content
         required,
         value=paciente.fecha_nacimiento.toISOString().split('T')[0]
       )
+      small.text-danger#fechaNacimientoError
 
     .mb-3
       label(for="sexo") Sexo
@@ -53,6 +62,7 @@ block content
         option(value="M", selected=paciente.sexo === 'M') Masculino
         option(value="F", selected=paciente.sexo === 'F') Femenino
         option(value="X", selected=paciente.sexo === 'X') Otro
+      small.text-danger#sexoError
 
     .mb-3
       label(for="telefono") Teléfono
@@ -64,6 +74,7 @@ block content
         title="Al menos 8 dígitos",
         value=paciente.telefono
       )
+      small.text-danger#telefonoError
 
     .mb-3
       label(for="direccion") Dirección
@@ -73,6 +84,7 @@ block content
         required,
         value=paciente.direccion
       )
+      small.text-danger#direccionError
 
     .mb-3
       label(for="contacto_emergencia") Contacto de emergencia
@@ -82,6 +94,7 @@ block content
         required,
         value=paciente.contacto_emergencia
       )
+      small.text-danger#contactoEmergenciaError
 
     .mb-3
       label(for="obra_social") Obra social
@@ -91,6 +104,7 @@ block content
         required,
         value=paciente.obra_social
       )
+      small.text-danger#obraSocialError
 
     .mb-3
       label(for="nro_afiliado") Nro. de afiliado
@@ -100,6 +114,57 @@ block content
         required,
         value=paciente.nro_afiliado
       )
+      small.text-danger#nroAfiliadoError
 
     button.btn.btn-primary(type="submit") Guardar cambios
     a.btn.btn-secondary(href="/pacientes") Volver al listado
+
+  script.
+    document.getElementById("formPaciente").addEventListener("submit", function(event) {
+      let valido = true;
+
+      document.querySelectorAll("small.text-danger").forEach(el => el.textContent = "");
+
+      const campos = [
+        { name: "nombre", errorId: "nombreError" },
+        { name: "apellido", errorId: "apellidoError" },
+        { name: "dni", errorId: "dniError" },
+        { name: "fecha_nacimiento", errorId: "fechaNacimientoError" },
+        { name: "sexo", errorId: "sexoError" },
+        { name: "telefono", errorId: "telefonoError" },
+        { name: "direccion", errorId: "direccionError" },
+        { name: "contacto_emergencia", errorId: "contactoEmergenciaError" },
+        { name: "obra_social", errorId: "obraSocialError" },
+        { name: "nro_afiliado", errorId: "nroAfiliadoError" }
+      ];
+
+      campos.forEach(campo => {
+        const input = document.getElementsByName(campo.name)[0];
+        const errorEl = document.getElementById(campo.errorId);
+
+        if (!input.value.trim()) {
+          errorEl.textContent = "⚠️ Este campo es obligatorio.";
+          valido = false;
+          return;
+        }
+
+        if (!input.checkValidity()) {
+          if (campo.name === "dni") {
+            errorEl.textContent = "⚠️ Solo números.";
+          } else if (campo.name === "telefono") {
+            errorEl.textContent = "⚠️ Ingresá al menos 8 dígitos numéricos.";
+          } else if (campo.name === "nombre" || campo.name === "apellido") {
+            errorEl.textContent = "⚠️ Solo letras y espacios permitidos.";
+          } else {
+            errorEl.textContent = "⚠️ Formato inválido.";
+          }
+          valido = false;
+        }
+      });
+
+      if (!valido) {
+        event.preventDefault();
+        alert("⚠️ Por favor corregí los errores antes de continuar.");
+      }
+    });
+

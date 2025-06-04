@@ -13,6 +13,13 @@ router.post('/pacientes/nuevo', (req, res) => {
     sexo, telefono, direccion, contacto_emergencia,
     obra_social, nro_afiliado
   } = req.body;
+  if (
+  !nombre?.trim() || !apellido?.trim() || !dni?.trim() || !fecha_nacimiento ||
+  !sexo || !telefono?.trim() || !direccion?.trim() ||
+  !contacto_emergencia?.trim() || !obra_social?.trim() || !nro_afiliado?.trim()
+) {
+  return res.send("⚠️ Todos los campos son obligatorios. Por favor, completalos.");
+}
 
   const sql = `
     INSERT INTO paciente
@@ -29,7 +36,7 @@ router.post('/pacientes/nuevo', (req, res) => {
   db.query(sql, valores, (err) => {
     if (err) {
       console.error('❌ Error al crear paciente:', err);
-      return res.send('Error al crear paciente.');
+      return res.send('❌ Error al crear paciente.');
     }
     res.redirect('/pacientes');
   });

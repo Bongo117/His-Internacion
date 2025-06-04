@@ -23,5 +23,5 @@ block content
               select.form-control(name="estado", onchange="this.form.submit()")
                 option(value="libre", selected=cama.estado==='libre') Libre
                 option(value="ocupada", selected=cama.estado==='ocupada') Ocupada
-            a.btn.btn-warning.btn-sm(href=`/camas/editar/${cama.id_cama}`) Editar (opcional)
+            a.btn.btn-warning.btn-sm(href=`/camas/editar/${cama.id_cama}`) Editar
   a.btn.btn-primary.mt-3(href="/camas/nuevo") + Agregar Cama

@@ -18,7 +18,6 @@ router.get("/admitir", (req, res) => {
     });
   });
 });
-r
 router.post("/admitir", (req, res) => {
   const {
     id_paciente,
@@ -27,7 +26,9 @@ router.post("/admitir", (req, res) => {
     tipo_ingreso,
     id_cama_asignada,
   } = req.body;
-
+  if (!id_paciente || !fecha_admision || !motivo || !tipo_ingreso || !id_cama_asignada) {
+  return res.send("⚠️ Todos los campos son obligatorios para admitir un paciente.");
+}
   const sqlCheckAdmision = `
     SELECT * FROM admision 
     WHERE id_paciente = ? AND estado = 'activa'
