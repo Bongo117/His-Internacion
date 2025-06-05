@@ -18,6 +18,7 @@ router.get("/admitir", (req, res) => {
     });
   });
 });
+
 router.post("/admitir", (req, res) => {
   const {
     id_paciente,
@@ -26,9 +27,25 @@ router.post("/admitir", (req, res) => {
     tipo_ingreso,
     id_cama_asignada,
   } = req.body;
-  if (!id_paciente || !fecha_admision || !motivo || !tipo_ingreso || !id_cama_asignada) {
-  return res.send("⚠️ Todos los campos son obligatorios para admitir un paciente.");
-}
+
+  if (
+    !id_paciente?.trim() ||
+    !fecha_admision ||
+    !motivo?.trim() ||
+    !tipo_ingreso ||
+    !id_cama_asignada?.trim()
+  ) {
+    return res.send("⚠️ Todos los campos son obligatorios para admitir un paciente.");
+  }
+
+  if (isNaN(parseInt(id_paciente)) || isNaN(parseInt(id_cama_asignada))) {
+    return res.send("⚠️ Selección inválida de paciente o cama.");
+  }
+
+  if (isNaN(Date.parse(fecha_admision))) {
+    return res.send("⚠️ Fecha de admisión inválida.");
+  }
+
   const sqlCheckAdmision = `
     SELECT * FROM admision 
     WHERE id_paciente = ? AND estado = 'activa'
@@ -79,8 +96,9 @@ router.post("/admitir", (req, res) => {
             WHERE c.id_habitacion = ? AND a.estado = 'activa'
           `;
           db.query(sqlSexos, [idHabitacion], (err, sexosOcupantes) => {
-            if (err)
+            if (err) {
               return res.send("❌ Error al verificar sexo en habitación.");
+            }
 
             const conflicto = sexosOcupantes.some(
               (s) => s.sexo !== sexoPaciente
@@ -125,7 +143,6 @@ router.post("/admitir", (req, res) => {
     });
   });
 });
-
 
 router.get("/admisiones", (req, res) => {
   const sql = `
