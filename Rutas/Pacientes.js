@@ -1,6 +1,12 @@
 const express = require('express');
 const router  = express.Router();
 const db      = require('../modelos/db');
+router.use((req, res, next) => {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+  next();
+});
 
 router.get('/pacientes/nuevo', (req, res) => {
   res.render('pacientes_nuevo', { titulo: 'Nuevo Paciente' });
