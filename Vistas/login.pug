@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  h1= titulo
+
+  if error
+    div.alert.alert-danger= error
+
+  form(method="POST", action="/login")
+    .mb-3
+      label(for="username") Usuario
+      input.form-control(type="text", name="username", required)
+
+    .mb-3
+      label(for="password") Contraseña
+      input.form-control(type="password", name="password", required)
+
+    button.btn.btn-primary(type="submit") Ingresar
