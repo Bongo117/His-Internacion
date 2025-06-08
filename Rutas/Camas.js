@@ -17,7 +17,7 @@ router.get('/camas', (req, res) => {
   `;
   db.query(sql, (err, camas) => {
     if (err) return res.send('Error al listar camas');
-    res.render('listar_camas', { titulo: 'Listado de Camas', camas });
+    res.render('listar_camas', { titulo: 'Listado de Camas', camas, bodyClass: "bg-camas" });
   });
 });
 
@@ -25,7 +25,7 @@ router.get('/camas/nuevo', (req, res) => {
   const sql = 'SELECT * FROM habitacion';
   db.query(sql, (err, habitaciones) => {
     if (err) return res.send('Error al obtener habitaciones');
-    res.render('camas_nuevo', { titulo: 'Nueva Cama', habitaciones });
+    res.render('camas_nuevo', { titulo: 'Nueva Cama', habitaciones, bodyClass: "bg-camas"  });
   });
 });
 

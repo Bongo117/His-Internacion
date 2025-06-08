@@ -9,7 +9,7 @@ router.use((req, res, next) => {
 });
 
 router.get('/pacientes/nuevo', (req, res) => {
-  res.render('pacientes_nuevo', { titulo: 'Nuevo Paciente' });
+  res.render('pacientes_nuevo', { titulo: 'Nuevo Paciente', bodyClass: 'bg-pacientes' });
 });
 
 
@@ -51,7 +51,7 @@ router.post('/pacientes/nuevo', (req, res) => {
 router.get('/pacientes', (req, res) => {
   db.query('SELECT * FROM paciente', (err, pacientes) => {
     if (err) return res.send('Error al listar pacientes');
-    res.render('listar_pacientes', { titulo: 'Listado de Pacientes', pacientes });
+    res.render('listar_pacientes', { titulo: 'Listado de Pacientes', pacientes, bodyClass: 'bg-pacientes' });
   });
 });
 
@@ -65,7 +65,7 @@ router.get('/pacientes/editar/:id', (req, res) => {
       return res.send('Paciente no encontrado.');
     }
     const paciente = resultados[0];
-    res.render('pacientes_editar', { titulo: 'Editar Paciente', paciente });
+    res.render('pacientes_editar', { titulo: 'Editar Paciente', paciente, bodyClass: 'bg-pacientes' });
   });
 });
 

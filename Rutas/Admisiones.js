@@ -168,6 +168,7 @@ router.get("/admisiones", (req, res) => {
     res.render("listar_admisiones", {
       titulo: "Listado de Admisiones",
       admisiones,
+      bodyClass: "bg-admisiones"
     });
   });
 });

@@ -66,3 +66,17 @@ small.text-danger {
   padding: 20px;
   margin-bottom: 20px;
 }
+.bg-admisiones {
+  background: url('admision.jpg') no-repeat center center fixed;
+  background-size: cover;
+}
+
+.bg-camas {
+  background: url('cama.jpg') no-repeat center center fixed;
+  background-size: cover;
+}
+
+.bg-pacientes {
+  background: url('paciente.jpg') no-repeat center center fixed;
+  background-size: cover;
+}
