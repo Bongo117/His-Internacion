@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Bongo117/His-Internaci-n#readme",
   "dependencies": {
     "express": "^5.1.0",
+    "express-session": "^1.18.1",
     "mysql2": "^3.14.1",
     "pug": "^3.0.3"
   }
