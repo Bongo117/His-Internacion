@@ -1,6 +1,4 @@
 body {
-  background: url('/fondo.jpg') no-repeat center center fixed;
-  background-size: cover;
   color: #333;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -66,17 +64,30 @@ small.text-danger {
   padding: 20px;
   margin-bottom: 20px;
 }
-.bg-admisiones {
-  background: url('admision.jpg') no-repeat center center fixed;
+
+.fondo-pacientes {
+  background: url('/paciente.jpg') no-repeat center center fixed;
   background-size: cover;
+  min-height: 100vh;
+  padding: 20px;
 }
 
-.bg-camas {
-  background: url('cama.jpg') no-repeat center center fixed;
+.fondo-admisiones {
+  background: url('/admision.jpg') no-repeat center center fixed;
   background-size: cover;
+  min-height: 100vh;
+  padding: 20px;
 }
 
-.bg-pacientes {
-  background: url('paciente.jpg') no-repeat center center fixed;
+.fondo-camas {
+  background: url('/cama.jpg') no-repeat center center fixed;
   background-size: cover;
+  min-height: 100vh;
+  padding: 20px;
+}
+.fondo-default {
+  background: url('/fondo.jpg') no-repeat center center fixed;
+  background-size: cover;
+  min-height: 100vh;
+  padding: 20px;
 }
