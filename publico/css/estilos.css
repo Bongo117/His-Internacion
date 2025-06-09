@@ -1,19 +1,26 @@
 body {
+  padding-top: 80px;
   color: #333;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .navbar {
-  background-color: #0069d9;
+  background-color: #00134be0 !important; 
+  position: fixed; 
+  top:0;
+  left: 0;
+  width: 100%;
+  z-index: 100; 
+  margin: 0;
+  padding: 10px 20px;
 }
+
 
 .navbar .navbar-brand,
 .navbar .nav-link {
-  color: rgb(94, 108, 230) !important;
-}
-
-.navbar .nav-link:hover {
-  color: #ffcc00 !important;
+  color: rgb(255, 255, 255) !important;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 h1, h2, h3 {
@@ -23,7 +30,7 @@ h1, h2, h3 {
 
 .btn-primary {
   background-color: #0069d9;
-  border-color: #005cbf;
+  border-color: #050505;
 }
 
 .btn-primary:hover {
@@ -90,4 +97,32 @@ small.text-danger {
   background-size: cover;
   min-height: 100vh;
   padding: 20px;
+}
+
+.fondo-default,
+.fondo-pacientes,
+.fondo-admisiones,
+.fondo-camas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: -1; 
+}
+
+.contenido-box {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.62);
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 1200px;
+  width: 100%;
+  z-index: 1; 
+}
+.texto-index {
+  font-weight: 400;
+  font-size:x-large;
+  color: #000000;
+  line-height: 1.5;
 }

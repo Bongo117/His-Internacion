@@ -9,19 +9,19 @@ html(lang="es")
   body(class=bodyClass || '')
     nav.navbar.navbar-expand-lg.navbar-light.bg-light
       .container
-        a.navbar-brand(href="/") HIS Internación
+        a.navbar-brand(href="/") HIS Internación 🚑 ⚕️ 🏥
         ul.navbar-nav
           if !user
             li.nav-item
-              a.nav-link(href="/login") Iniciar sesión
+              a.nav-link(href="/login") Iniciar sesión 🥼
           else
             li.nav-item
-              a.nav-link(href="/pacientes") Pacientes
+              a.nav-link(href="/pacientes") Pacientes 😷
             li.nav-item
-              a.nav-link(href="/admitir") Admisiones
+              a.nav-link(href="/admitir") Admisiones 🗓️
             li.nav-item
-              a.nav-link(href="/camas") Camas
+              a.nav-link(href="/camas") Camas 🛏️
             li.nav-item
-              a.nav-link(href="/logout") Cerrar sesión
+              a.nav-link(href="/logout") Cerrar sesión ❌
     .container.mt-4
       block content
