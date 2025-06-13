@@ -15,3 +15,5 @@ Para crear la base de datos y sus tablas, ejecutá en MySQL:
 
 ```sql
 SOURCE backup.sql;
+
+Imágenes utilizadas de Pexels con licencia libre.
