@@ -11,22 +11,24 @@ module.exports = {
 
   
   procesarLogin: (req, res) => {
-    const { usuario, password } = req.body;
+  console.log("💡 procesarLogin recibidos:", req.body);
+  const { usuario, password } = req.body;
+  console.log("💡 valores usados en consulta:", usuario, password);
 
-    if (!usuario?.trim() || !password?.trim()) {
-      return res.send("⚠️ Completa usuario y contraseña.");
+  if (!usuario?.trim() || !password?.trim()) {
+    return res.send("⚠️ Completa usuario y contraseña.");
+  }
+
+  const sql = "SELECT id_usuario, username, rol FROM usuario WHERE username = ? AND password = ?";
+  db.query(sql, [usuario, password], (err, resultados) => {
+    if (err) {
+      console.error("Error al consultar usuario:", err);
+      return res.send("❌ Error interno en el servidor.");
     }
-
-    const sql = "SELECT id_usuario, username, rol FROM usuario WHERE username = ? AND password = ?";
-    db.query(sql, [usuario, password], (err, resultados) => {
-      if (err) {
-        console.error("Error al consultar usuario:", err);
-        return res.send("❌ Error interno en el servidor.");
-      }
-      if (resultados.length === 0) {
-        
-        return res.send("❌ Usuario o contraseña incorrectos.");
-      }
+    console.log("💡 resultados de la consulta:", resultados);
+    if (resultados.length === 0) {
+      return res.send("❌ Usuario o contraseña incorrectos.");
+    }
 
     
       const user = resultados[0];
@@ -36,7 +38,7 @@ module.exports = {
         rol: user.rol
       };
     
-      return res.redirect("/admitir");
+      return res.redirect("/");
     });
   },
 

@@ -13,7 +13,7 @@ html(lang="es")
         ul.navbar-nav
           if !user
             li.nav-item
-              a.nav-link(href="/login") Iniciar sesión 🥼
+              a.nav-link(href="/auth/login") Iniciar sesión 🥼
           else
             li.nav-item
               a.nav-link(href="/pacientes") Pacientes 😷
@@ -22,6 +22,6 @@ html(lang="es")
             li.nav-item
               a.nav-link(href="/camas") Camas 🛏️
             li.nav-item
-              a.nav-link(href="/logout") Cerrar sesión ❌
+              a.nav-link(href="/auth/logout") Cerrar sesión ❌
     .container.mt-4
       block content
