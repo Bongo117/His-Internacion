@@ -1,29 +1,42 @@
 extends layout
 
 block content
- .fondo-camas
- .contenido-box
-  h1= titulo
+  .fondo-camas
+  .contenido-box
+    h1= titulo
 
-  table.table.table-striped
-    thead
-      tr
-        th ID
-        th Número
-        th Habitación
-        th Estado
-        th Acciones
-    tbody
-      each cama in camas
+    table.table.table-striped
+      thead
         tr
-          td= cama.id_cama
-          td= cama.numero
-          td= cama.habitacion
-          td= cama.estado
-          td
-            form(method="POST", action=`/camas/estado/${cama.id_cama}`, style="display:inline;")
-              select.form-control(name="estado", onchange="this.form.submit()")
-                option(value="libre", selected=cama.estado==='libre') Libre
-                option(value="ocupada", selected=cama.estado==='ocupada') Ocupada
-            a.btn.btn-warning.btn-sm(href=`/camas/editar/${cama.id_cama}`) Editar
-  a.btn.btn-primary.mt-3(href="/camas/nuevo") + Agregar Cama
+          th ID
+          th Número
+          th Habitación
+          th Estado
+          th Acciones
+      tbody
+        each cama in camas
+          tr
+            td= cama.id_cama
+            td= cama.numero
+            td= cama.habitacion
+            td
+              if cama.estado === 'libre'
+                span.badge.bg-success Libre
+              else if cama.estado === 'ocupada'
+                span.badge.bg-danger Ocupada
+              else if cama.estado === 'higienizando'
+                span.badge.bg-warning.text-dark Higienizando
+
+            td
+              form(method="POST", action=`/camas/estado/${cama.id_cama}`, style="display:inline;")
+                select.form-control.form-select(name="estado", onchange="this.form.submit()")
+                  option(value="libre", selected=cama.estado==='libre') Libre
+                  option(value="ocupada", selected=cama.estado==='ocupada') Ocupada
+                  option(value="higienizando", selected=cama.estado==='higienizando') Higienizando
+              a.btn.btn-outline-primary.btn-sm.ms-2(href=`/camas/editar/${cama.id_cama}`)
+                i.bi.bi-pencil-square.me-1
+                | Editar
+
+    a.btn.btn-primary.mt-3(href="/camas/nuevo")
+      i.bi.bi-plus-circle.me-1
+      | Agregar Cama
