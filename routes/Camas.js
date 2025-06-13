@@ -1,56 +1,23 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const db = require('../models/db');
+const camasController = require("../controllers/camasController");
+
+// Middleware para verificar sesión
 router.use((req, res, next) => {
-  if (!req.session.user) {
-    return res.redirect('/login');
-  }
+  if (!req.session.user) return res.redirect("/auth/login");
   next();
 });
 
-router.get('/camas', (req, res) => {
-  const sql = `
-    SELECT c.id_cama, c.numero, c.estado, h.numero AS habitacion
-    FROM cama c
-    JOIN habitacion h ON c.id_habitacion = h.id_habitacion
-    ORDER BY c.id_cama
-  `;
-  db.query(sql, (err, camas) => {
-    if (err) return res.send('Error al listar camas');
-    res.render('listar_camas', { titulo: 'Listado de Camas', camas, bodyClass: "bg-camas" });
-  });
-});
+// Listar camas
+router.get("/", camasController.listarCamas);
 
-router.get('/camas/nuevo', (req, res) => {
-  const sql = 'SELECT * FROM habitacion';
-  db.query(sql, (err, habitaciones) => {
-    if (err) return res.send('Error al obtener habitaciones');
-    res.render('camas_nuevo', { titulo: 'Nueva Cama', habitaciones, bodyClass: "bg-camas"  });
-  });
-});
+// Formulario para crear nueva cama
+router.get("/nuevo", camasController.mostrarFormularioNuevo);
 
-router.post('/camas/nuevo', (req, res) => {
-  const { id_habitacion, numero } = req.body;
-  const sql = 'INSERT INTO cama (id_habitacion, numero, estado) VALUES (?, ?, "libre")';
-  db.query(sql, [id_habitacion, numero], (err) => {
-    if (err) {
-      console.error('Error al crear cama:', err);
-      return res.send('Error al crear cama.');
-    }
-    res.redirect('/camas');
-  });
-});
+// Procesar creación de nueva cama
+router.post("/nuevo", camasController.crearCama);
 
-router.post('/camas/estado/:id', (req, res) => {
-  const { estado } = req.body;
-  const sql = 'UPDATE cama SET estado = ? WHERE id_cama = ?';
-  db.query(sql, [estado, req.params.id], (err) => {
-    if (err) {
-      console.error('Error al actualizar estado de cama:', err);
-      return res.send('Error al actualizar estado de cama.');
-    }
-    res.redirect('/camas');
-  });
-});
+// Cambiar estado de una cama
+router.post("/estado/:id", camasController.cambiarEstado);
 
 module.exports = router;

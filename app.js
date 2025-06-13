@@ -20,12 +20,12 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: false }));
 
-const authRoutes       = require('./routes/Auth');
+const authRoutes       = require("./routes/Auth");
 const admisionesRoutes = require('./routes/Admisiones');
 const pacientesRoutes  = require('./routes/Pacientes');
 const camasRoutes      = require('./routes/Camas');
 
-app.use('/auth',      authRoutes);
+app.use("/auth",      authRoutes);
 app.use('/',          admisionesRoutes);
 app.use('/pacientes', pacientesRoutes);
 app.use('/camas',     camasRoutes);
