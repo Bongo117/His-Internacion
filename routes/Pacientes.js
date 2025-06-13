@@ -1,6 +1,6 @@
 const express = require('express');
 const router  = express.Router();
-const db      = require('../modelos/db');
+const db      = require('../models/db');
 router.use((req, res, next) => {
   if (!req.session.user) {
     return res.redirect('/login');

@@ -3,6 +3,7 @@ const path = require('path');
 const session = require('express-session');
 
 const app = express();
+
 app.use(session({
   secret: 'super-secret-key',
   resave: false,
@@ -15,20 +16,19 @@ app.use((req, res, next) => {
 });
 
 app.set('view engine', 'pug');
-app.set('views', path.join(__dirname, 'Vistas'));
-
-app.use(express.static(path.join(__dirname, 'publico')));
+app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: false }));
 
-const authRoutes = require('./Rutas/Auth'); 
-const rutaAdmisiones = require('./Rutas/Admisiones');
-const rutaPacientes  = require('./Rutas/Pacientes');
-const rutaCamas      = require('./Rutas/Camas');
+const authRoutes       = require('./routes/Auth');
+const admisionesRoutes = require('./routes/Admisiones');
+const pacientesRoutes  = require('./routes/Pacientes');
+const camasRoutes      = require('./routes/Camas');
 
-app.use(authRoutes); 
-app.use('/', rutaAdmisiones);
-app.use('/', rutaPacientes);
-app.use('/', rutaCamas);
+app.use('/auth',      authRoutes);
+app.use('/',          admisionesRoutes);
+app.use('/pacientes', pacientesRoutes);
+app.use('/camas',     camasRoutes);
 
 app.get('/', (req, res) => {
   res.render('index', { titulo: 'Módulo de Admisión HIS' });
