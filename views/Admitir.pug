@@ -1,65 +1,82 @@
 extends layout
 
 block content
- .fondo-admisiones
- .contenido-box
-  h1.text-success.mb-4= titulo
-  p Aquí podrás completar la admisión de un paciente.
+  .fondo-admisiones
+  .contenido-box
+    h1.text-success.mb-4= titulo
+    p Aquí podrás completar la admisión de un paciente.
 
-  form(method="POST", action="/admitir")
-    .mb-3
-      label.form-label(for="id_paciente") Paciente
-      select.form-control(id="id_paciente", name="id_paciente", required, onchange="mostrarDatosPaciente()")
-        option(value="") Seleccionar...
-        each paciente in pacientes
-          option(
-            value=paciente.id_paciente 
-            data-dni=paciente.dni || '' 
-            data-fnac=paciente.fecha_nacimiento || '' 
-            data-tel=paciente.telefono || '' 
-            data-os=paciente.obra_social || '' 
-            data-naf=paciente.nro_afiliado || ''
-          )= paciente.nombre + ' ' + paciente.apellido
+    if error
+      div.alert.alert-warning= error
 
-      a.btn.btn-link.mt-2(href="/pacientes/nuevo") + Crear nuevo paciente
+    form(method="POST", action="/admitir")
+      .mb-3
+        label.form-label(for="id_paciente") Paciente
+        select.form-control#id_paciente(name="id_paciente", required, onchange="mostrarDatosPaciente()")
+          option(value="") Seleccionar...
+          each paciente in pacientes
+            option(
+              value=paciente.id_paciente
+              data-dni=paciente.dni || ''
+              data-fnac=paciente.fecha_nacimiento || ''
+              data-tel=paciente.telefono || ''
+              data-os=paciente.obra_social || ''
+              data-naf=paciente.nro_afiliado || ''
+              selected=(String(datos.id_paciente) === String(paciente.id_paciente))
+            )= paciente.nombre + ' ' + paciente.apellido
 
-    #datosPaciente.mt-3(style="display: none;")
-      h5.text-primary Datos del paciente:
-      ul.list-group
-        li.list-group-item ID: #[span#dp_id]
-        li.list-group-item DNI: #[span#dp_dni]
-        li.list-group-item Fecha de nacimiento: #[span#dp_fnac]
-        li.list-group-item Teléfono: #[span#dp_tel]
-        li.list-group-item Obra Social: #[span#dp_os]
-        li.list-group-item Nº Afiliado: #[span#dp_naf]
+        a.btn.btn-link.mt-2(href="/pacientes/nuevo") + Crear nuevo paciente
 
-    .mb-3
-      label.form-label(for="fecha_admision") Fecha de admisión
-      input.form-control(type="date", name="fecha_admision", required)
+      #datosPaciente.mt-3(style="display: none;")
+        h5.text-primary Datos del paciente:
+        ul.list-group
+          li.list-group-item ID: #[span#dp_id]
+          li.list-group-item DNI: #[span#dp_dni]
+          li.list-group-item Fecha de nacimiento: #[span#dp_fnac]
+          li.list-group-item Teléfono: #[span#dp_tel]
+          li.list-group-item Obra Social: #[span#dp_os]
+          li.list-group-item Nº Afiliado: #[span#dp_naf]
 
-    .mb-3
-      label.form-label(for="motivo") Motivo
-      textarea.form-control(name="motivo", rows="3", required, pattern=".{5,}", title="Al menos 5 caracteres")
+      .mb-3
+        label.form-label(for="fecha_admision") Fecha de admisión
+        input.form-control(
+          type="date",
+          name="fecha_admision",
+          required,
+          value=datos.fecha_admision
+        )
 
-    .mb-3
-      label.form-label(for="tipo_ingreso") Tipo de ingreso
-      select.form-control(name="tipo_ingreso", required)
-        option(value="") Seleccionar...
-        option(value="derivado") Derivado
-        option(value="emergencia") Emergencia
-        option(value="quirurgico") Quirúrgico
+      .mb-3
+        label.form-label(for="motivo") Motivo
+        textarea.form-control(
+          name="motivo",
+          rows="3",
+          required,
+          pattern=".{5,}",
+          title="Al menos 5 caracteres"
+        )= datos.motivo
 
-    .mb-3
-      label.form-label(for="id_cama_asignada") Cama disponible
-      select.form-control(name="id_cama_asignada", required)
-        option(value="") Seleccionar...
-        each cama in camas
-          option(value=cama.id_cama)= 'Cama ID ' + cama.id_cama
+      .mb-3
+        label.form-label(for="tipo_ingreso") Tipo de ingreso
+        select.form-control(name="tipo_ingreso", required)
+          option(value="", selected=!datos.tipo_ingreso) Seleccionar...
+          option(value="derivado", selected=datos.tipo_ingreso==='derivado') Derivado
+          option(value="emergencia", selected=datos.tipo_ingreso==='emergencia') Emergencia
+          option(value="quirurgico", selected=datos.tipo_ingreso==='quirurgico') Quirúrgico
 
-    button.btn.btn-primary(type="submit") Registrar admisión
+      .mb-3
+        label.form-label(for="id_cama_asignada") Cama disponible
+        select.form-control(name="id_cama_asignada", required)
+          option(value="", selected=!datos.id_cama_asignada) Seleccionar...
+          each cama in camas
+             option(
+              value=cama.id_cama,
+              selected=String(datos.id_cama_asignada)===String(cama.id_cama)
+            )= 'Cama ' + cama.numero
 
-  br
-  a.btn.btn-secondary(href="/") Volver al inicio
+      button.btn.btn-primary(type="submit") Registrar admisión
+    br
+    a.btn.btn-secondary(href="/") Volver al inicio
 
   script.
     function mostrarDatosPaciente() {

@@ -37,6 +37,10 @@ block content
                 i.bi.bi-pencil-square.me-1
                 | Editar
 
-    a.btn.btn-primary.mt-3(href="/camas/nuevo")
-      i.bi.bi-plus-circle.me-1
-      | Agregar Cama
+    a.btn.btn-success.mt-4.d-inline-flex.align-items-center(
+      href="/camas/nuevo",
+      data-bs-toggle="tooltip",
+      title="Registrar una nueva cama en una habitación"
+    )
+      i.bi.bi-bed.me-2
+      |+ Agregar Cama 
