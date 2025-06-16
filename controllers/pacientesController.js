@@ -1,6 +1,7 @@
 const db = require("../models/db");
 
 module.exports = {
+
   mostrarFormularioNuevo: (req, res) => {
     res.render("pacientes_nuevo", {
       titulo: "Nuevo Paciente",
@@ -37,15 +38,15 @@ module.exports = {
 
     db.query(sql, valores, (err) => {
       if (err) {
-        console.error('❌ Error al crear paciente:', err);
-        return res.send('❌ Error al crear paciente.');
+        console.error("❌ Error al crear paciente:", err);
+        return res.send("❌ Error al crear paciente.");
       }
-      res.redirect('/pacientes');
+      res.redirect("/pacientes");
     });
   },
 
   listarPacientes: (req, res) => {
-    const { buscar } = req.query;
+    const { buscar, error } = req.query;
     let sql = 'SELECT * FROM paciente';
     let params = [];
 
@@ -57,7 +58,7 @@ module.exports = {
     db.query(sql, params, (err, pacientes) => {
       if (err) {
         console.error("❌ Error al listar pacientes:", err);
-        return res.render('listar_pacientes', {
+        return res.render("listar_pacientes", {
           titulo: "Listado de Pacientes",
           pacientes: [],
           buscar,
@@ -70,7 +71,7 @@ module.exports = {
         titulo: "Listado de Pacientes",
         pacientes,
         buscar,
-        error: null,
+        error: error || null,
         bodyClass: "bg-pacientes"
       });
     });
@@ -86,10 +87,9 @@ module.exports = {
         return res.send("Paciente no encontrado.");
       }
 
-      const paciente = resultados[0];
       res.render("pacientes_editar", {
         titulo: "Editar Paciente",
-        paciente,
+        paciente: resultados[0],
         bodyClass: "bg-pacientes"
       });
     });
@@ -137,7 +137,6 @@ module.exports = {
   eliminarPaciente: (req, res) => {
     const { id } = req.params;
 
-  
     const sqlCheck = `
       SELECT * FROM admision
       WHERE id_paciente = ? AND estado = 'activa'
@@ -159,6 +158,7 @@ module.exports = {
           console.error("❌ Error al eliminar paciente:", err);
           return res.redirect("/pacientes?error=Error al eliminar paciente.");
         }
+
         res.redirect("/pacientes");
       });
     });

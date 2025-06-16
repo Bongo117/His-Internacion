@@ -8,7 +8,9 @@ block content
     form.mb-4(method="GET", action="/pacientes")
       .input-group
         input.form-control(type="text", name="buscar", placeholder="Buscar por nombre o apellido", value=buscar || '')
-        button.btn.btn-outline-secondary(type="submit")
+        button.btn.btn-primary(type="submit")
+
+
           i.bi.bi-search.me-1
           | Buscar
 
