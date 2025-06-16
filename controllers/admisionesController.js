@@ -4,6 +4,7 @@ module.exports = {
   mostrarFormulario: (req, res) => {
     const queryPacientes = "SELECT * FROM paciente";
     const queryCamas = "SELECT id_cama, numero FROM cama WHERE estado = 'libre'";
+    
 
     db.query(queryPacientes, (err, pacientes) => {
       if (err) return res.send("Error al obtener pacientes");

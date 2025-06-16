@@ -5,7 +5,7 @@ block content
   .contenido-box
     h1.text-success.mb-4= titulo
     p Aquí podrás completar la admisión de un paciente.
-
+    
     if error
       div.alert.alert-warning= error
 
@@ -69,10 +69,10 @@ block content
         select.form-control(name="id_cama_asignada", required)
           option(value="", selected=!datos.id_cama_asignada) Seleccionar...
           each cama in camas
-             option(
+            option(
               value=cama.id_cama,
               selected=String(datos.id_cama_asignada)===String(cama.id_cama)
-            )= 'Cama ' + cama.numero
+            )= `Cama ${cama.numero} – Habitación ${cama.habitacion_numero}`
 
       button.btn.btn-primary(type="submit") Registrar admisión
     br
@@ -90,7 +90,19 @@ block content
 
       document.getElementById('dp_id').textContent   = selected.value;
       document.getElementById('dp_dni').textContent  = selected.dataset.dni || '-';
-      document.getElementById('dp_fnac').textContent = selected.dataset.fnac || '-';
+
+     
+      let fnacRaw = selected.dataset.fnac;
+      if (fnacRaw) {
+        let d = new Date(fnacRaw);
+        let dd = String(d.getDate()).padStart(2,'0');
+        let mm = String(d.getMonth()+1).padStart(2,'0');
+        let yyyy = d.getFullYear();
+        document.getElementById('dp_fnac').textContent = `${dd}-${mm}-${yyyy}`;
+      } else {
+        document.getElementById('dp_fnac').textContent = '-';
+      }
+
       document.getElementById('dp_tel').textContent  = selected.dataset.tel || '-';
       document.getElementById('dp_os').textContent   = selected.dataset.os || '-';
       document.getElementById('dp_naf').textContent  = selected.dataset.naf || '-';

@@ -1,41 +1,70 @@
 extends layout
 
 block content
- .fondo-pacientes
- .contenido-box 
-  h1= titulo
-  
-  table.table.table-striped
-    thead
-      tr
-        th Nombre
-        th Apellido
-        th DNI
-        th Fecha Nacimiento
-        th Sexo
-        th Teléfono
-        th Dirección
-        th Contacto Emergencia
-        th Obra Social
-        th Nº Afiliado
-        th Acciones  
+  .fondo-pacientes
+  .contenido-box 
+    h1.mb-4= titulo
 
-    tbody
-      each paciente in pacientes
+    form.mb-4(method="GET", action="/pacientes")
+      .input-group
+        input.form-control(type="text", name="buscar", placeholder="Buscar por nombre o apellido", value=buscar || '')
+        button.btn.btn-outline-secondary(type="submit")
+          i.bi.bi-search.me-1
+          | Buscar
+
+    if error
+      div.alert.alert-warning= error
+
+    table.table.table-striped
+      thead
         tr
-          td= paciente.nombre
-          td= paciente.apellido
-          td= paciente.dni
-          td= paciente.fecha_nacimiento.toDateString ? paciente.fecha_nacimiento.toDateString() : paciente.fecha_nacimiento
-          td= paciente.sexo
-          td= paciente.telefono
-          td= paciente.direccion
-          td= paciente.contacto_emergencia
-          td= paciente.obra_social
-          td= paciente.nro_afiliado
-          td  
-            a.btn.btn-warning.btn-sm(href=`/pacientes/editar/${paciente.id_paciente}`) Editar
-            form(method="POST", action=`/pacientes/eliminar/${paciente.id_paciente}`, style="display:inline;", onsubmit="return confirm('¿Confirma eliminar?');")
-              button.btn.btn-danger.btn-sm(type="submit") Eliminar
+          th Nombre
+          th Apellido
+          th DNI
+          th Fecha Nacimiento
+          th Sexo
+          th Teléfono
+          th Dirección
+          th Contacto Emergencia
+          th Obra Social
+          th Nº Afiliado
+          th Acciones  
 
-  a.btn.btn-primary.mt-3(href="/pacientes/nuevo") + Agregar Paciente
+      tbody
+        each paciente in pacientes
+          tr
+            td= paciente.nombre
+            td= paciente.apellido
+            td= paciente.dni
+            td 
+             - if (paciente.fecha_nacimiento)
+               = new Date(paciente.fecha_nacimiento).toLocaleDateString('es-AR')
+             - else
+               | -'-'
+            td= paciente.sexo
+            td= paciente.telefono
+            td= paciente.direccion
+            td= paciente.contacto_emergencia
+            td= paciente.obra_social
+            td= paciente.nro_afiliado
+            td  
+              a.btn.btn-outline-primary.btn-sm.me-2(
+                href=`/pacientes/editar/${paciente.id_paciente}`,
+                title="Editar paciente"
+              )
+                i.bi.bi-pencil-square.me-1
+                | Editar
+
+              form(
+                method="POST", 
+                action=`/pacientes/eliminar/${paciente.id_paciente}`, 
+                style="display:inline;", 
+                onsubmit="return confirm('¿Confirma eliminar este paciente?');"
+              )
+                button.btn.btn-outline-danger.btn-sm(type="submit")
+                  i.bi.bi-trash.me-1
+                  | Eliminar
+
+    a.btn.btn-success.mt-4.d-inline-flex.align-items-center(href="/pacientes/nuevo")
+      i.bi.bi-person-plus-fill.me-2
+      | Agregar Paciente
