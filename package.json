@@ -4,9 +4,9 @@
   "description": "HIS - Módulo de Internación",
   "main": "app.js",
   "scripts": {
-  "start": "node app.js",
-  "test": "echo \"Error: no test specified\" && exit 1"
-},
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Bongo117/His-Internaci-n.git"
@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/Bongo117/His-Internaci-n#readme",
   "dependencies": {
+    "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
     "mysql2": "^3.14.1",
