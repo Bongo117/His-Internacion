@@ -8,10 +8,14 @@ router.use((req, res, next) => {
 });
 
 router.get("/admitir", admisionesController.mostrarFormulario);
+
 router.post("/admitir", admisionesController.procesarAdmision);
+
 router.get("/admisiones", admisionesController.listarAdmisiones);
 
-router.post("/admisiones/finalizar/:id", admisionesController.finalizarAdmision);
-router.post("/admisiones/cancelar/:id", admisionesController.cancelarAdmision);
+router.post("/admisiones/:id/finalizar", admisionesController.finalizarAdmision);
+
+router.post("/admisiones/:id/cancelar", admisionesController.cancelarAdmision);
 
 module.exports = router;
+
