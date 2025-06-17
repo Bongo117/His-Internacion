@@ -1,0 +1,48 @@
+extends layout
+
+block content
+  .fondo-admisiones
+  .contenido-box
+    h1.mb-4= titulo
+
+    if admisiones.length === 0
+      div.alert.alert-info No hay admisiones para este paciente.
+    else
+      table.table.table-striped
+        thead
+          tr
+            th ID
+            th Fecha
+            th Motivo
+            th Tipo
+            th Estado
+            th Cama
+            th Habitación
+            th Acciones
+        tbody
+          each a in admisiones
+            tr
+              td= a.id_admision
+              td= a.fecha_admision
+              td= a.motivo
+              td= a.tipo_ingreso
+              td
+                if a.estado === 'activa'
+                  span.badge.bg-success Activa
+                else if a.estado === 'finalizada'
+                  span.badge.bg-secondary Finalizada
+                else if a.estado === 'cancelada'
+                  span.badge.bg-warning.text-dark Cancelada
+              td= a.nro_cama
+              td= a.nro_habitacion
+              td
+                if a.estado === 'activa'
+                  // Finalizar
+                  form.d-inline(method="POST", action=`/admisiones/${a.id_admision}/finalizar`)
+                    button.btn.btn-sm.btn-outline-success(type="submit") Finalizar
+                  // Cancelar
+                  form.d-inline.ms-2(method="POST", action=`/admisiones/${a.id_admision}/cancelar`)
+                    button.btn.btn-sm.btn-outline-danger(type="submit") Cancelar
+
+    a.btn.btn-secondary.mt-4(href="/pacientes") ← Volver a Pacientes
+

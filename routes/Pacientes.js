@@ -25,5 +25,7 @@ router.post("/editar/:id", pacientesController.editarPaciente);
 
 
 router.post("/eliminar/:id", pacientesController.eliminarPaciente);
+ 
+router.get("/:id/admisiones", pacientesController.listarAdmisionesDePaciente);
 
 module.exports = router;

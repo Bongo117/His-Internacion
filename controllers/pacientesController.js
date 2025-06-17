@@ -134,6 +134,38 @@ module.exports = {
     });
   },
 
+
+  listarAdmisionesDePaciente: (req, res) => {
+    const { id } = req.params;
+    const sql = `
+      SELECT 
+        a.id_admision,
+        DATE_FORMAT(a.fecha_admision, '%d/%m/%Y') AS fecha_admision,
+        a.motivo,
+        a.tipo_ingreso,
+        a.estado,
+        c.numero    AS nro_cama,
+        h.numero    AS nro_habitacion
+      FROM admision a
+      JOIN cama c    ON a.id_cama_asignada = c.id_cama
+      JOIN habitacion h ON c.id_habitacion    = h.id_habitacion
+      WHERE a.id_paciente = ?
+      ORDER BY a.fecha_admision DESC
+    `;
+    db.query(sql, [id], (err, admisiones) => {
+      if (err) {
+        console.error("❌ Error al obtener admisiones de paciente:", err);
+        return res.send("Error al cargar las admisiones.");
+      }
+      res.render("paciente_admisiones", {
+        titulo: `Admisiones de Paciente #${id}`,
+        admisiones,
+        pacienteId: id,
+        bodyClass: "bg-admisiones"
+      });
+    });
+  },
+  
   eliminarPaciente: (req, res) => {
     const { id } = req.params;
 

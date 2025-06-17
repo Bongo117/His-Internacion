@@ -3,7 +3,10 @@ extends layout
 block content
   .fondo-camas
   .contenido-box
-    h1= titulo
+    h1.mb-4= titulo
+
+    if msg
+      div.alert.alert-success= msg
 
     table.table.table-striped
       thead
@@ -26,10 +29,9 @@ block content
                 span.badge.bg-danger Ocupada
               else if cama.estado === 'higienizando'
                 span.badge.bg-warning.text-dark Higienizando
-
             td
               form(method="POST", action=`/camas/estado/${cama.id_cama}`, style="display:inline;")
-                select.form-control.form-select(name="estado", onchange="this.form.submit()")
+                select.form-select(name="estado", onchange="this.form.submit()")
                   option(value="libre", selected=cama.estado==='libre') Libre
                   option(value="ocupada", selected=cama.estado==='ocupada') Ocupada
                   option(value="higienizando", selected=cama.estado==='higienizando') Higienizando
@@ -37,10 +39,6 @@ block content
                 i.bi.bi-pencil-square.me-1
                 | Editar
 
-    a.btn.btn-success.mt-4.d-inline-flex.align-items-center(
-      href="/camas/nuevo",
-      data-bs-toggle="tooltip",
-      title="Registrar una nueva cama en una habitación"
-    )
+    a.btn.btn-success.mt-4.d-inline-flex.align-items-center(href="/camas/nuevo")
       i.bi.bi-bed.me-2
-      |+ Agregar Cama 
+      |+ Agregar Cama

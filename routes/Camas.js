@@ -7,19 +7,11 @@ router.use((req, res, next) => {
   next();
 });
 
-
 router.get("/", camasController.listarCamas);
-
-
 router.get("/nuevo", camasController.mostrarFormularioNuevo);
-
-router.get('/editar/:id', camasController.mostrarFormularioEditar);
-
-
 router.post("/nuevo", camasController.crearCama);
-
-
 router.post("/estado/:id", camasController.cambiarEstado);
+router.get("/editar/:id", camasController.mostrarFormularioEditar);
+router.post("/editar/:id", camasController.actualizarCama);
 
-router.post('/editar/:id', camasController.actualizarCama);
 module.exports = router;

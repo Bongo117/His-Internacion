@@ -4,7 +4,6 @@ module.exports = {
   mostrarFormulario: (req, res) => {
     const queryPacientes = "SELECT * FROM paciente";
     const queryCamas = "SELECT id_cama, numero FROM cama WHERE estado = 'libre'";
-    
 
     db.query(queryPacientes, (err, pacientes) => {
       if (err) return res.send("Error al obtener pacientes");
@@ -30,13 +29,11 @@ module.exports = {
       id_cama_asignada,
     } = req.body;
 
-    
     const loadData = (errorMessage) => {
       db.query("SELECT * FROM paciente", (err, pacientes) => {
         if (err) return res.send("Error al obtener pacientes");
         db.query("SELECT id_cama, numero FROM cama WHERE estado = 'libre'", (err, camas) => {
           if (err) return res.send("Error al obtener camas");
-          console.log("🛏️ Camas disponibles:", camas);
           res.render("admitir", {
             titulo: "Admitir Paciente",
             pacientes,
@@ -81,7 +78,6 @@ module.exports = {
         return loadData("⚠️ Este paciente ya tiene una admisión activa.");
       }
 
-    
       const sqlCama = 'SELECT * FROM cama WHERE id_cama = ? AND estado = "libre"';
       db.query(sqlCama, [id_cama_asignada], (err, resultadoCama) => {
         if (err || resultadoCama.length === 0) {
@@ -125,9 +121,7 @@ module.exports = {
                 (s) => s.sexo !== sexoPaciente
               );
               if (conflicto) {
-                return loadData(
-                  "⚠️ Conflicto de sexo en la habitación. No se puede asignar."
-                );
+                return loadData("⚠️ Conflicto de sexo en la habitación. No se puede asignar.");
               }
 
               const sqlInsert = `
@@ -185,6 +179,48 @@ module.exports = {
         admisiones,
         bodyClass: "bg-admisiones"
       });
+    });
+  },
+
+  finalizarAdmision: (req, res) => {
+    const { id } = req.params;
+
+    const sqlFinalizar = "UPDATE admision SET estado = 'finalizada' WHERE id_admision = ?";
+    const sqlLiberarCama = `
+      UPDATE cama 
+      SET estado = 'higienizando' 
+      WHERE id_cama = (SELECT id_cama_asignada FROM admision WHERE id_admision = ?)
+    `;
+
+    db.query(sqlFinalizar, [id], (err) => {
+      if (err) {
+        console.error("❌ Error al finalizar admisión:", err);
+        return res.send("Error al finalizar admisión.");
+      }
+
+      db.query(sqlLiberarCama, [id]);
+      res.redirect("/admisiones");
+    });
+  },
+
+  cancelarAdmision: (req, res) => {
+    const { id } = req.params;
+
+    const sqlCancelar = "UPDATE admision SET estado = 'cancelada' WHERE id_admision = ?";
+    const sqlLiberarCama = `
+      UPDATE cama 
+      SET estado = 'libre' 
+      WHERE id_cama = (SELECT id_cama_asignada FROM admision WHERE id_admision = ?)
+    `;
+
+    db.query(sqlCancelar, [id], (err) => {
+      if (err) {
+        console.error("❌ Error al cancelar admisión:", err);
+        return res.send("Error al cancelar admisión.");
+      }
+
+      db.query(sqlLiberarCama, [id]);
+      res.redirect("/admisiones");
     });
   }
 };

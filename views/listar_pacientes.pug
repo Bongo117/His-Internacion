@@ -9,8 +9,6 @@ block content
       .input-group
         input.form-control(type="text", name="buscar", placeholder="Buscar por nombre o apellido", value=buscar || '')
         button.btn.btn-primary(type="submit")
-
-
           i.bi.bi-search.me-1
           | Buscar
 
@@ -31,7 +29,6 @@ block content
           th Obra Social
           th Nº Afiliado
           th Acciones  
-
       tbody
         each paciente in pacientes
           tr
@@ -39,33 +36,40 @@ block content
             td= paciente.apellido
             td= paciente.dni
             td 
-             - if (paciente.fecha_nacimiento)
-               = new Date(paciente.fecha_nacimiento).toLocaleDateString('es-AR')
-             - else
-               | -'-'
+              - if (paciente.fecha_nacimiento)
+                = new Date(paciente.fecha_nacimiento).toLocaleDateString('es-AR')
+              - else
+                | -
             td= paciente.sexo
             td= paciente.telefono
             td= paciente.direccion
             td= paciente.contacto_emergencia
             td= paciente.obra_social
             td= paciente.nro_afiliado
-            td  
-              a.btn.btn-outline-primary.btn-sm.me-2(
-                href=`/pacientes/editar/${paciente.id_paciente}`,
-                title="Editar paciente"
-              )
-                i.bi.bi-pencil-square.me-1
-                | Editar
+            td
+              .d-flex.flex-column.align-items-start.gap-2
+                a.btn.btn-outline-info.btn-sm(
+                  href=`/pacientes/${paciente.id_paciente}/admisiones`,
+                  title="Ver admisiones"
+                )
+                  i.bi.bi-journal-text.me-1
+                  | Admisiones
 
-              form(
-                method="POST", 
-                action=`/pacientes/eliminar/${paciente.id_paciente}`, 
-                style="display:inline;", 
-                onsubmit="return confirm('¿Confirma eliminar este paciente?');"
-              )
-                button.btn.btn-outline-danger.btn-sm(type="submit")
-                  i.bi.bi-trash.me-1
-                  | Eliminar
+                a.btn.btn-outline-primary.btn-sm(
+                  href=`/pacientes/editar/${paciente.id_paciente}`,
+                  title="Editar paciente"
+                )
+                  i.bi.bi-pencil-square.me-1
+                  | Editar
+
+                form(
+                  method="POST", 
+                  action=`/pacientes/eliminar/${paciente.id_paciente}`, 
+                  onsubmit="return confirm('¿Confirma eliminar este paciente?');"
+                )
+                  button.btn.btn-outline-danger.btn-sm(type="submit")
+                    i.bi.bi-trash.me-1
+                    | Eliminar
 
     a.btn.btn-success.mt-4.d-inline-flex.align-items-center(href="/pacientes/nuevo")
       i.bi.bi-person-plus-fill.me-2
