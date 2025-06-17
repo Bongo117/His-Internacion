@@ -6,7 +6,9 @@ block content
   h1= titulo
 
   if error
-    div.alert.alert-danger= error
+    div.alert.alert-danger
+      i.bi.bi-exclamation-triangle-fill.me-2
+      = error
 
   form(method="POST", action="/auth/login")
     .mb-3

@@ -3,11 +3,12 @@ const db = require("../models/db");
 module.exports = {
  
   mostrarLogin: (req, res) => {
-    res.render("login", {
-      titulo: "Iniciar Sesión",
-      bodyClass: "bg-login"
-    });
-  },
+  res.render("login", {
+    titulo: "Iniciar Sesión",
+    error: null,
+    bodyClass: "bg-login"
+  });
+},
 
   
   procesarLogin: (req, res) => {
@@ -27,9 +28,12 @@ module.exports = {
     }
     console.log("💡 resultados de la consulta:", resultados);
     if (resultados.length === 0) {
-      return res.send("❌ Usuario o contraseña incorrectos.");
+      return res.render("login", {
+        titulo: "Iniciar Sesión",
+        error: "❌ Usuario o contraseña incorrectos.",
+        bodyClass: "bg-login"
+      });
     }
-
     
       const user = resultados[0];
       req.session.user = {
