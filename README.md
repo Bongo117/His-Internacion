@@ -1,19 +1,88 @@
- HIS - Módulo de Internación
+HIS - Módulo de Admisión e Internación
 
-Este es un proyecto integrador para la materia Programación Web II. El objetivo es desarrollar un sistema hospitalario básico centrado en el módulo de admisión y recepción de pacientes.
+Proyecto Integrador para la materia Programación Web II.
 
-Este módulo permite simular el flujo de internación de pacientes en un hospital. A futuro se implementará:
+Descripción
 
-- Registro de pacientes derivados o nuevos.
-- Asignación de habitaciones y camas disponibles.
-- Evaluación inicial por enfermería.
-- Gestión de cancelación o modificación de admisiones.
+Este proyecto implementa el módulo de admisión y recepción de pacientes de un sistema hospitalario (HIS). Permite simular el flujo completo de internación, desde la recepción del paciente hasta la asignación de cama.
 
-Base de Datos:
+URLs de entrega
 
-Para crear la base de datos y sus tablas, ejecutá en MySQL:
+Repositorio GitHub: https://github.com/Bongo117/His-Internacion.git
 
-```sql
-SOURCE backup.sql;
+Endpoint de inicio del módulo: his-internacion-production.up.railway.app
 
-Imágenes utilizadas de Pexels con licencia libre.
+Video: https://drive.google.com/file/d/1te5qMOYBC8UDsjP6SHXvZ2_kTTQOl7BQ/view?usp=sharing
+
+ Funcionalidades principales
+
+Registro y listado de pacientes.
+
+Selección de tipo de ingreso: emergencia, derivado, quirúrgico.
+
+Asignación de habitaciones y camas disponibles.
+
+Estado de admisión (activa, finalizada, cancelada).
+
+Scripts para poblar BD con datos de prueba (usuarios, motivos, turnos, etc.).
+
+Requisitos previos
+
+Node.js (v14+)
+
+npm
+
+MySQL / MariaDB
+
+Instalación y despliegue local
+
+Clona el repositorio o descargalo
+
+Instala dependencias:
+
+npm install
+
+Crear  la base de datos:
+
+Está en la carpeta backup
+
+ejecutar:
+
+
+npm start       
+
+Abrir en el navegador: http://localhost:3000
+
+Pacientes de prueba para poder ingresar: recep1, admin1, enfer1, medico1. Todos con contraseña 1234
+
+Base de Datos
+
+Nombre: his_internacion
+
+Tablas principales: paciente, admision, cama, habitacion, usuario, evaluacion_enfermeria, evaluacion_medica.
+
+El backup.sql incluye:
+
+Usuarios de prueba con roles (recepcionista, enfermero, medico, admin).
+
+Datos ejemplos de admisiones y camas.
+
+ Referencias
+
+Express Documentation
+
+Sequelize ORM
+
+Pug Templating
+
+pexels.com
+
+
+
+
+
+
+
+
+
+

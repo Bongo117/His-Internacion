@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-06-2025 a las 02:59:55
+-- Tiempo de generación: 18-06-2025 a las 06:23:39
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -42,8 +42,14 @@ CREATE TABLE `admision` (
 --
 
 INSERT INTO `admision` (`id_admision`, `id_paciente`, `fecha_admision`, `motivo`, `tipo_ingreso`, `estado`, `id_cama_asignada`) VALUES
-(1, 4, '2025-05-27 00:00:00', 'Se amputó el dedo anular con un cuchillo cortando zapallo', 'emergencia', 'activa', 2),
-(2, 8, '2025-06-09 00:00:00', 'Infarto', 'emergencia', 'activa', 3);
+(1, 4, '2025-05-27 00:00:00', 'Se amputó el dedo anular con un cuchillo cortando zapallo', 'emergencia', 'finalizada', 2),
+(2, 8, '2025-06-09 00:00:00', 'Infarto', 'emergencia', 'activa', 3),
+(3, 6, '2025-06-15 00:00:00', 'p-pñ-', 'emergencia', 'finalizada', 5),
+(4, 5, '2025-06-16 00:00:00', 'tose con sangre', 'derivado', 'cancelada', 6),
+(5, 10, '2025-06-29 00:00:00', 'MA ECHO\' UN EZGUINZE', 'derivado', 'finalizada', 7),
+(6, 11, '2025-06-07 00:00:00', 'S', 'derivado', 'finalizada', 1),
+(7, 11, '2025-06-16 00:00:00', 'ejyuyt', 'derivado', 'cancelada', 7),
+(8, 5, '2025-06-21 00:00:00', 'fisura hueso parietal derecho', 'emergencia', 'activa', 8);
 
 -- --------------------------------------------------------
 
@@ -64,10 +70,13 @@ CREATE TABLE `cama` (
 
 INSERT INTO `cama` (`id_cama`, `id_habitacion`, `numero`, `estado`) VALUES
 (1, 1, 1, 'libre'),
-(2, 1, 2, 'ocupada'),
+(2, 1, 2, 'higienizando'),
 (3, 2, 1, 'ocupada'),
-(4, 2, 2, 'libre'),
-(5, 3, 1, 'libre');
+(4, 2, 2, 'higienizando'),
+(5, 3, 1, 'libre'),
+(6, 4, 2, 'libre'),
+(7, 7, 10, 'libre'),
+(8, 7, 3, 'ocupada');
 
 -- --------------------------------------------------------
 
@@ -157,8 +166,10 @@ INSERT INTO `paciente` (`id_paciente`, `dni`, `nombre`, `apellido`, `fecha_nacim
 (4, '3546456645', 'jorge', 'añañin', '2010-01-27', 'M', '56565656', 'fasfs', '45454545', 'osde', '7'),
 (5, '24897189', 'Juana', 'DeArco', '2000-02-02', 'F', '654654654', 'aca a la vuelta 321', '6556565965', 'osecac', '4'),
 (6, '767787', 'Eusebio', 'Cramabolt', '1994-12-02', 'M', '12312312321', 'su casa', '45324324', 'dosep', '1'),
-(7, '1', 'Jaun Manuel', 'Fangio', '1911-06-24', 'M', '123456789', 'El Podio', '5454545445', 'osde', '6'),
-(8, '2026042', 'Clotilde', 'Tía', '1980-02-29', 'F', '22222222', 'donde topa', '3', 'swiss medical', '4');
+(7, '1', 'Jaun Manuel', 'Fangio', '1911-06-24', 'M', '123456788', 'El Podio', '5454545445', 'osde', '6'),
+(8, '2026042', 'Clotilde', 'Tía', '1980-02-29', 'F', '22222222', 'donde topa', '3', 'swiss medical', '4'),
+(10, '2', 'Pablito', 'Lescano', '2025-06-28', 'X', '55774488445454', 'Si', 'No', 'dosep', 'do'),
+(11, '5', 'X', 'X', '2025-06-05', 'M', '25487698', 'X', 'X', 'X', 'X');
 
 -- --------------------------------------------------------
 
@@ -246,13 +257,13 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT de la tabla `admision`
 --
 ALTER TABLE `admision`
-  MODIFY `id_admision` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_admision` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `cama`
 --
 ALTER TABLE `cama`
-  MODIFY `id_cama` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_cama` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `evaluacion_enfermeria`
@@ -276,7 +287,7 @@ ALTER TABLE `habitacion`
 -- AUTO_INCREMENT de la tabla `paciente`
 --
 ALTER TABLE `paciente`
-  MODIFY `id_paciente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_paciente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `usuario`
@@ -319,3 +330,4 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
