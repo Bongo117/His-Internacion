@@ -1,12 +1,12 @@
-HIS - Módulo de Admisión e Internación
+# HIS - Módulo de Admisión e Internación
 
 Proyecto Integrador para la materia Programación Web II.
 
-Descripción
+**Descripció**n
 
 Este proyecto implementa el módulo de admisión y recepción de pacientes de un sistema hospitalario (HIS). Permite simular el flujo completo de internación, desde la recepción del paciente hasta la asignación de cama.
 
-URLs de entrega
+**URLs de entrega**
 
 Repositorio GitHub: https://github.com/Bongo117/His-Internacion.git
 
@@ -14,7 +14,7 @@ Endpoint de inicio del módulo: his-internacion-production.up.railway.app
 
 Video: https://drive.google.com/file/d/1te5qMOYBC8UDsjP6SHXvZ2_kTTQOl7BQ/view?usp=sharing
 
- Funcionalidades principales
+**Funcionalidades principales**
 
 Registro y listado de pacientes.
 
@@ -24,7 +24,7 @@ Asignación de habitaciones y camas disponibles.
 
 Estado de admisión (activa, finalizada, cancelada).
 
-Scripts para poblar BD con datos de prueba (usuarios, motivos, turnos, etc.).
+**Scripts para poblar BD con datos de prueba **(usuarios, motivos, turnos, etc.).
 
 Requisitos previos
 
@@ -34,7 +34,7 @@ npm
 
 MySQL / MariaDB
 
-Instalación y despliegue local
+**Instalación y despliegue local**
 
 Clona el repositorio o descargalo
 
@@ -55,7 +55,7 @@ Abrir en el navegador: http://localhost:3000
 
 Pacientes de prueba para poder ingresar: recep1, admin1, enfer1, medico1. Todos con contraseña 1234
 
-Base de Datos
+**Base de Datos**
 
 Nombre: his_internacion
 
@@ -67,7 +67,7 @@ Usuarios de prueba con roles (recepcionista, enfermero, medico, admin).
 
 Datos ejemplos de admisiones y camas.
 
- Referencias
+** Referencias**
 
 Express Documentation
 
