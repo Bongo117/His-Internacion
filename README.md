@@ -87,6 +87,7 @@ Video: https://drive.google.com/file/d/1te5qMOYBC8UDsjP6SHXvZ2_kTTQOl7BQ/view?us
 - Sequelize ORM  
 - Pug Templating  
 - pexels.com
+- getbootstrap.com
 
 
 
