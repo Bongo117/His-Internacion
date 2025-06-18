@@ -1,7 +1,6 @@
 const db = require("../models/db");
 
 module.exports = {
-
   mostrarFormularioNuevo: (req, res) => {
     res.render("pacientes_nuevo", {
       titulo: "Nuevo Paciente",
@@ -9,7 +8,7 @@ module.exports = {
     });
   },
 
-  crearPaciente: (req, res) => {
+  crearPaciente: async (req, res) => {
     const {
       nombre, apellido, dni, fecha_nacimiento,
       sexo, telefono, direccion, contacto_emergencia,
@@ -24,28 +23,39 @@ module.exports = {
       return res.send("⚠️ Todos los campos son obligatorios.");
     }
 
-    const sql = `
-      INSERT INTO paciente
-      (nombre, apellido, dni, fecha_nacimiento, sexo, telefono, direccion, contacto_emergencia, obra_social, nro_afiliado)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
+    let connection;
+    try {
+      connection = await new Promise((resolve, reject) => {
+        db.getConnection((err, conn) => {
+          if (err) reject(err);
+          else resolve(conn);
+        });
+      });
 
-    const valores = [
-      nombre, apellido, dni, fecha_nacimiento,
-      sexo, telefono, direccion, contacto_emergencia,
-      obra_social, nro_afiliado
-    ];
+      const sql = `
+        INSERT INTO paciente
+        (nombre, apellido, dni, fecha_nacimiento, sexo, telefono, direccion, 
+         contacto_emergencia, obra_social, nro_afiliado)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
 
-    db.query(sql, valores, (err) => {
-      if (err) {
-        console.error("❌ Error al crear paciente:", err);
-        return res.send("❌ Error al crear paciente.");
-      }
+      const valores = [
+        nombre, apellido, dni, fecha_nacimiento,
+        sexo, telefono, direccion, contacto_emergencia,
+        obra_social, nro_afiliado
+      ];
+
+      await connection.promise().query(sql, valores);
       res.redirect("/pacientes");
-    });
+    } catch (err) {
+      console.error("❌ Error al crear paciente:", err);
+      res.send("❌ Error al crear paciente.");
+    } finally {
+      if (connection) connection.release();
+    }
   },
 
-  listarPacientes: (req, res) => {
+  listarPacientes: async (req, res) => {
     const { buscar, error } = req.query;
     let sql = 'SELECT * FROM paciente';
     let params = [];
@@ -55,18 +65,17 @@ module.exports = {
       params = [`%${buscar}%`, `%${buscar}%`];
     }
 
-    db.query(sql, params, (err, pacientes) => {
-      if (err) {
-        console.error("❌ Error al listar pacientes:", err);
-        return res.render("listar_pacientes", {
-          titulo: "Listado de Pacientes",
-          pacientes: [],
-          buscar,
-          error: "Error al listar pacientes.",
-          bodyClass: "bg-pacientes"
+    let connection;
+    try {
+      connection = await new Promise((resolve, reject) => {
+        db.getConnection((err, conn) => {
+          if (err) reject(err);
+          else resolve(conn);
         });
-      }
+      });
 
+      const [pacientes] = await connection.promise().query(sql, params);
+      
       res.render("listar_pacientes", {
         titulo: "Listado de Pacientes",
         pacientes,
@@ -74,16 +83,37 @@ module.exports = {
         error: error || null,
         bodyClass: "bg-pacientes"
       });
-    });
+    } catch (err) {
+      console.error("❌ Error al listar pacientes:", err);
+      res.render("listar_pacientes", {
+        titulo: "Listado de Pacientes",
+        pacientes: [],
+        buscar,
+        error: "Error al listar pacientes.",
+        bodyClass: "bg-pacientes"
+      });
+    } finally {
+      if (connection) connection.release();
+    }
   },
 
-  mostrarFormularioEditar: (req, res) => {
+  mostrarFormularioEditar: async (req, res) => {
     const { id } = req.params;
-    const sql = 'SELECT * FROM paciente WHERE id_paciente = ?';
+    let connection;
+    try {
+      connection = await new Promise((resolve, reject) => {
+        db.getConnection((err, conn) => {
+          if (err) reject(err);
+          else resolve(conn);
+        });
+      });
 
-    db.query(sql, [id], (err, resultados) => {
-      if (err || resultados.length === 0) {
-        console.error("❌ Error al obtener paciente:", err);
+      const [resultados] = await connection.promise().query(
+        'SELECT * FROM paciente WHERE id_paciente = ?',
+        [id]
+      );
+
+      if (resultados.length === 0) {
         return res.send("Paciente no encontrado.");
       }
 
@@ -92,10 +122,15 @@ module.exports = {
         paciente: resultados[0],
         bodyClass: "bg-pacientes"
       });
-    });
+    } catch (err) {
+      console.error("❌ Error al obtener paciente:", err);
+      res.send("Paciente no encontrado.");
+    } finally {
+      if (connection) connection.release();
+    }
   },
 
-  editarPaciente: (req, res) => {
+  editarPaciente: async (req, res) => {
     const { id } = req.params;
     const {
       nombre, apellido, dni, fecha_nacimiento,
@@ -111,89 +146,116 @@ module.exports = {
       return res.send("⚠️ Todos los campos son obligatorios.");
     }
 
-    const sql = `
-      UPDATE paciente SET
-        nombre = ?, apellido = ?, dni = ?, fecha_nacimiento = ?, sexo = ?,
-        telefono = ?, direccion = ?, contacto_emergencia = ?, obra_social = ?, nro_afiliado = ?
-      WHERE id_paciente = ?
-    `;
+    let connection;
+    try {
+      connection = await new Promise((resolve, reject) => {
+        db.getConnection((err, conn) => {
+          if (err) reject(err);
+          else resolve(conn);
+        });
+      });
 
-    const valores = [
-      nombre, apellido, dni, fecha_nacimiento,
-      sexo, telefono, direccion, contacto_emergencia,
-      obra_social, nro_afiliado, id
-    ];
+      const sql = `
+        UPDATE paciente SET
+          nombre = ?, apellido = ?, dni = ?, fecha_nacimiento = ?, sexo = ?,
+          telefono = ?, direccion = ?, contacto_emergencia = ?, 
+          obra_social = ?, nro_afiliado = ?
+        WHERE id_paciente = ?
+      `;
 
-    db.query(sql, valores, (err) => {
-      if (err) {
-        console.error("❌ Error al actualizar paciente:", err);
-        return res.send("Error al actualizar paciente.");
-      }
+      const valores = [
+        nombre, apellido, dni, fecha_nacimiento,
+        sexo, telefono, direccion, contacto_emergencia,
+        obra_social, nro_afiliado, id
+      ];
 
+      await connection.promise().query(sql, valores);
       res.redirect("/pacientes");
-    });
+    } catch (err) {
+      console.error("❌ Error al actualizar paciente:", err);
+      res.send("Error al actualizar paciente.");
+    } finally {
+      if (connection) connection.release();
+    }
   },
 
-
-  listarAdmisionesDePaciente: (req, res) => {
+  listarAdmisionesDePaciente: async (req, res) => {
     const { id } = req.params;
-    const sql = `
-      SELECT 
-        a.id_admision,
-        DATE_FORMAT(a.fecha_admision, '%d/%m/%Y') AS fecha_admision,
-        a.motivo,
-        a.tipo_ingreso,
-        a.estado,
-        c.numero    AS nro_cama,
-        h.numero    AS nro_habitacion
-      FROM admision a
-      JOIN cama c    ON a.id_cama_asignada = c.id_cama
-      JOIN habitacion h ON c.id_habitacion    = h.id_habitacion
-      WHERE a.id_paciente = ?
-      ORDER BY a.fecha_admision DESC
-    `;
-    db.query(sql, [id], (err, admisiones) => {
-      if (err) {
-        console.error("❌ Error al obtener admisiones de paciente:", err);
-        return res.send("Error al cargar las admisiones.");
-      }
+    let connection;
+    try {
+      connection = await new Promise((resolve, reject) => {
+        db.getConnection((err, conn) => {
+          if (err) reject(err);
+          else resolve(conn);
+        });
+      });
+
+      const sql = `
+        SELECT 
+          a.id_admision,
+          DATE_FORMAT(a.fecha_admision, '%d/%m/%Y') AS fecha_admision,
+          a.motivo,
+          a.tipo_ingreso,
+          a.estado,
+          c.numero AS nro_cama,
+          h.numero AS nro_habitacion
+        FROM admision a
+        JOIN cama c ON a.id_cama_asignada = c.id_cama
+        JOIN habitacion h ON c.id_habitacion = h.id_habitacion
+        WHERE a.id_paciente = ?
+        ORDER BY a.fecha_admision DESC
+      `;
+      
+      const [admisiones] = await connection.promise().query(sql, [id]);
+      
       res.render("paciente_admisiones", {
         titulo: `Admisiones de Paciente #${id}`,
         admisiones,
         pacienteId: id,
         bodyClass: "bg-admisiones"
       });
-    });
+    } catch (err) {
+      console.error("❌ Error al obtener admisiones de paciente:", err);
+      res.send("Error al cargar las admisiones.");
+    } finally {
+      if (connection) connection.release();
+    }
   },
   
-  eliminarPaciente: (req, res) => {
+  eliminarPaciente: async (req, res) => {
     const { id } = req.params;
+    let connection;
+    try {
+      connection = await new Promise((resolve, reject) => {
+        db.getConnection((err, conn) => {
+          if (err) reject(err);
+          else resolve(conn);
+        });
+      });
 
-    const sqlCheck = `
-      SELECT * FROM admision
-      WHERE id_paciente = ? AND estado = 'activa'
-    `;
-
-    db.query(sqlCheck, [id], (err, admisiones) => {
-      if (err) {
-        console.error("Error al verificar admisiones:", err);
-        return res.redirect("/pacientes?error=Error al verificar restricciones.");
-      }
+      // Verificar admisiones activas
+      const [admisiones] = await connection.promise().query(
+        `SELECT * FROM admision
+         WHERE id_paciente = ? AND estado = 'activa'`,
+        [id]
+      );
 
       if (admisiones.length > 0) {
         return res.redirect("/pacientes?error=No se puede eliminar un paciente con admisión activa.");
       }
 
-      const sql = 'DELETE FROM paciente WHERE id_paciente = ?';
-      db.query(sql, [id], (err) => {
-        if (err) {
-          console.error("❌ Error al eliminar paciente:", err);
-          return res.redirect("/pacientes?error=Error al eliminar paciente.");
-        }
+      // Eliminar paciente
+      await connection.promise().query(
+        'DELETE FROM paciente WHERE id_paciente = ?',
+        [id]
+      );
 
-        res.redirect("/pacientes");
-      });
-    });
+      res.redirect("/pacientes");
+    } catch (err) {
+      console.error("❌ Error al eliminar paciente:", err);
+      res.redirect("/pacientes?error=Error al eliminar paciente.");
+    } finally {
+      if (connection) connection.release();
+    }
   }
 };
-
