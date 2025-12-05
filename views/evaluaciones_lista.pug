@@ -1,0 +1,21 @@
+extends layout
+
+block content
+  .contenido-box
+    h2 🩺 Pacientes en Internación
+    table.table.table-striped
+      thead
+        tr
+          th Paciente
+          th Ubicación
+          th Acciones
+      tbody
+        each p in pacientes
+          tr
+            td= p.apellido + ", " + p.nombre
+            td= `${p.ala} - Cama ${p.cama}`
+            td
+              a.btn.btn-primary.btn-sm(href="/evaluaciones/nueva/" + p.id_admision) 📝 Evolucionar
+    
+    if pacientes.length == 0
+        p.text-muted No hay pacientes internados actualmente.

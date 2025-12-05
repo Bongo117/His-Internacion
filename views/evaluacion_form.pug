@@ -1,0 +1,42 @@
+extends layout
+
+block content
+  .contenido-box
+    h2= titulo
+    form(method="POST" action="/evaluaciones/guardar")
+      input(type="hidden" name="id_admision" value=id_admision)
+      
+      .mb-3
+        label.form-label Diagnóstico / Evolución
+        textarea.form-control(name="diagnostico" required rows="3")
+      
+      .mb-3
+        label.form-label Tratamiento / Indicaciones
+        textarea.form-control(name="tratamientos" required rows="3")
+
+      fieldset.border.p-3.mb-3
+        legend.w-auto.px-2.fs-6 Signos Vitales
+        .row
+          .col-md-4.mb-3
+            label.form-label(for="presion_arterial") Presión Arterial (mmHg)
+            input.form-control(type="text" name="presion_arterial" id="presion_arterial" placeholder="Ej: 120/80")
+          .col-md-4.mb-3
+            label.form-label(for="temperatura") Temperatura (°C)
+            input.form-control(type="number" step="0.1" name="temperatura" id="temperatura" placeholder="Ej: 36.5")
+          .col-md-4.mb-3
+            label.form-label(for="frec_cardiaca") Frec. Cardíaca (lpm)
+            input.form-control(type="number" name="frec_cardiaca" id="frec_cardiaca" placeholder="Ej: 75")
+        .row
+          .col-md-4.mb-3
+            label.form-label(for="frec_respiratoria") Frec. Respiratoria (rpm)
+            input.form-control(type="number" name="frec_respiratoria" id="frec_respiratoria" placeholder="Ej: 16")
+          .col-md-4.mb-3
+            label.form-label(for="saturacion_o2") Saturación O₂ (%)
+            input.form-control(type="number" name="saturacion_o2" id="saturacion_o2" placeholder="Ej: 98")
+
+      .form-check.mb-3.p-3.border.rounded.bg-light
+        input.form-check-input#alta(type="checkbox" name="alta_medica")
+        label.form-check-label.fw-bold.text-success(for="alta") 🏥 DAR ALTA MÉDICA (Finaliza la internación)
+
+      button.btn.btn-success(type="submit") Guardar Evolución
+      a.btn.btn-link(href="/evaluaciones") Cancelar

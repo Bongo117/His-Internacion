@@ -29,11 +29,13 @@ const authRoutes       = require('./routes/Auth');
 const admisionesRoutes = require('./routes/Admisiones');
 const pacientesRoutes  = require('./routes/Pacientes');
 const camasRoutes      = require('./routes/Camas');
+const evaluacionesRoutes = require('./routes/Evaluaciones');
 
 app.use('/auth',      authRoutes);
 app.use('/',          admisionesRoutes);
 app.use('/pacientes', pacientesRoutes);
 app.use('/camas',     camasRoutes);
+app.use('/evaluaciones', evaluacionesRoutes);
 
 
 app.get('/', (req, res) => {
