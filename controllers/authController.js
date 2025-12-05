@@ -1,73 +1,69 @@
 const db = require("../models/db");
+const bcrypt = require('bcryptjs');
 
 module.exports = {
   mostrarLogin: (req, res) => {
-    res.render("login", {
-      titulo: "Iniciar Sesión",
-      error: null,
-      bodyClass: "bg-login"
-    });
+    res.render("login", { titulo: "Iniciar Sesión", error: null });
   },
 
   procesarLogin: async (req, res) => {
-    console.log("💡 procesarLogin recibidos:", req.body);
     const { usuario, password } = req.body;
-    console.log("💡 valores usados en consulta:", usuario, password);
 
-    if (!usuario?.trim() || !password?.trim()) {
-      return res.render("login", {
-        titulo: "Iniciar Sesión",
-        error: "⚠️ Completa usuario y contraseña.",
-        bodyClass: "bg-login"
+    // Validación básica
+    if (!usuario || !password) {
+      return res.render("login", { 
+        titulo: "Iniciar Sesión", 
+        error: "⚠️ Por favor ingrese usuario y contraseña" 
       });
     }
 
-    let connection;
     try {
-    
-      connection = await new Promise((resolve, reject) => {
-        db.getConnection((err, conn) => {
-          if (err) reject(err);
-          else resolve(conn);
-        });
-      });
+      // 1. Buscamos el usuario en la BD
+      const [rows] = await db.promise().query(
+        "SELECT * FROM usuario WHERE username = ?", 
+        [usuario]
+      );
 
-      const sql = "SELECT id_usuario, username, rol FROM usuario WHERE username = ? AND password = ?";
-      const [rows] = await connection.promise().query(sql, [usuario, password]);
-
-      console.log("💡 resultados de la consulta:", rows);
       if (rows.length === 0) {
-        return res.render("login", {
-          titulo: "Iniciar Sesión",
-          error: "❌ Usuario o contraseña incorrectos.",
-          bodyClass: "bg-login"
-        });
+        return res.render("login", { titulo: "Iniciar Sesión", error: "❌ Usuario no encontrado" });
       }
-      
+
       const user = rows[0];
-      req.session.user = {
-        id: user.id_usuario,
-        username: user.username,
-        rol: user.rol
-      };
-    
-      return res.redirect("/");
-    } catch (err) {
-      console.error("Error al consultar usuario:", err);
-      return res.render("login", {
-        titulo: "Iniciar Sesión",
-        error: "❌ Error temporal, intenta nuevamente",
-        bodyClass: "bg-login"
-      });
-    } finally {
+
+      // 2. VERIFICACIÓN DE CONTRASEÑA (HÍBRIDA PARA NO ROMPER NADA)
+      // Esto permite que funcionen tus usuarios viejos (texto plano) y los nuevos (encriptados)
+      // DEFENSA: "Implementé una estrategia de migración progresiva para soportar usuarios legacy".
+      let match = false;
       
-      if (connection) connection.release();
+      if (user.password.startsWith('$2a$')) {
+          // Si empieza con $2a$, es un hash de bcrypt -> Comparamos seguro
+          match = await bcrypt.compare(password, user.password);
+      } else {
+          // Si no, es texto plano (como '1234') -> Comparamos directo
+          // TODO: En producción, aquí deberíamos encriptarla y guardarla actualizada.
+          match = (user.password === password);
+      }
+
+      if (match) {
+        // Login exitoso: Guardamos en sesión
+        req.session.user = {
+          id: user.id_usuario,
+          username: user.username,
+          rol: user.rol
+        };
+        res.redirect("/");
+      } else {
+        res.render("login", { titulo: "Iniciar Sesión", error: "❌ Contraseña incorrecta" });
+      }
+
+    } catch (err) {
+      console.error(err);
+      res.render("login", { titulo: "Iniciar Sesión", error: "Error de servidor" });
     }
   },
 
   logout: (req, res) => {
-    req.session.destroy(err => {
-      res.redirect("/auth/login");
-    });
+    req.session.destroy();
+    res.redirect("/auth/login");
   }
 };

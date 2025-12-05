@@ -66,6 +66,37 @@ module.exports = {
           throw new Error("El paciente ya tiene una internación activa.");
         }
 
+        // --- VALIDACIÓN DE GÉNERO EN HABITACIÓN COMPARTIDA ---
+        // 1. Buscamos el sexo del paciente que queremos internar
+        const [pacienteInfo] = await connection.promise().query(
+            "SELECT sexo FROM paciente WHERE id_paciente = ?", 
+            [id_paciente]
+        );
+        const sexoPaciente = pacienteInfo[0].sexo;
+
+        // 2. Buscamos si hay ALGUIEN MÁS en esa misma habitación
+        // (Buscamos la habitación de la cama seleccionada -> buscamos otras camas ocupadas en esa habitación -> buscamos el sexo del paciente en esa cama)
+        const sqlValidarSexo = `
+            SELECT p.sexo 
+            FROM cama c1
+            JOIN cama c2 ON c1.id_habitacion = c2.id_habitacion  -- Misma habitación
+            JOIN admision a ON c2.id_cama = a.id_cama_asignada   -- Cama ocupada
+            JOIN paciente p ON a.id_paciente = p.id_paciente     -- Paciente ocupante
+            WHERE c1.id_cama = ?                                 -- La cama que yo elegí
+            AND c2.id_cama != ?                                  -- Que no sea la misma cama
+            AND a.estado = 'activa'                              -- Que esté internado ahora
+        `;
+        
+        const [compañeros] = await connection.promise().query(sqlValidarSexo, [id_cama_asignada, id_cama_asignada]);
+
+        // 3. Si hay compañero y es de otro sexo -> ERROR
+        if (compañeros.length > 0) {
+            const sexoCompañero = compañeros[0].sexo;
+            if (sexoCompañero !== sexoPaciente) {
+                throw new Error(`Habitación compartida: No se puede mezclar sexo ${sexoPaciente} con ${sexoCompañero}.`);
+            }
+        }
+
         // 2. Insertar la Admisión
         const [result] = await connection.promise().query(
           "INSERT INTO admision (id_paciente, fecha_admision, motivo, tipo_ingreso, id_cama_asignada) VALUES (?, ?, ?, ?, ?)",

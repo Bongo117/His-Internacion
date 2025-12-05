@@ -84,7 +84,6 @@ Video: https://drive.google.com/file/d/1te5qMOYBC8UDsjP6SHXvZ2_kTTQOl7BQ/view?us
 ## **Referencias**
 
 - Express Documentation  
-- Sequelize ORM  
 - Pug Templating  
 - pexels.com
 - getbootstrap.com
