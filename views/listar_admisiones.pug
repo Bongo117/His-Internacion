@@ -26,17 +26,22 @@ block content
             td= admision.cama_numero
             td= admision.habitacion_numero
             td= admision.estado
-            td
-              if admision.estado === 'activa'
-                .d-flex.flex-column.gap-2
-                  form(method="POST", action=`/admisiones/${admision.id_admision}/finalizar`, style="display:inline;")
-                    button.btn.btn-danger.btn-sm(type="submit", onclick="return confirm('¿Finalizar esta admisión?');")
+            td 
+              .d-flex.flex-column.gap-2
+                a.btn.btn-info.btn-sm.w-100(href=`/admisiones/${admision.id_admision}/detalle`)
+                  i.bi.bi-eye-fill.me-1
+                  | Ver Detalle
+                if admision.estado === 'activa'
+                  a.btn.btn-primary.btn-sm.w-100(href=`/evaluaciones/nueva/${admision.id_admision}`)
+                    i.bi.bi-pencil-square.me-1
+                    | Evolucionar
+                  form(method="POST", action=`/admisiones/${admision.id_admision}/finalizar`)
+                    button.btn.btn-danger.btn-sm.w-100(type="submit", onclick="return confirm('¿Finalizar esta admisión?');")
                       i.bi.bi-check-circle-fill.me-1
                       | Finalizar
-                  form(method="POST", action=`/admisiones/${admision.id_admision}/cancelar`, style="display:inline;")
-                    button.btn.btn-secondary.btn-sm(type="submit", onclick="return confirm('¿Cancelar esta admisión?');")
+                  form(method="POST", action=`/admisiones/${admision.id_admision}/cancelar`)
+                    button.btn.btn-secondary.btn-sm.w-100(type="submit", onclick="return confirm('¿Cancelar esta admisión?');")
                       i.bi.bi-x-circle-fill.me-1
                       | Cancelar
 
     a.btn.btn-secondary.mt-3(href="/") Volver al inicio
-

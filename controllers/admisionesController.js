@@ -180,6 +180,68 @@ module.exports = {
         if (connection) connection.release();
         }
   },
+
+  verDetalleAdmision: async (req, res) => {
+    const { id } = req.params;
+    let connection;
+    try {
+      connection = await new Promise((resolve, reject) => {
+        db.getConnection((err, conn) => {
+          if (err) reject(err);
+          else resolve(conn);
+        });
+      });
+
+      // Query para los datos principales de la admisión
+      const sqlAdmision = `
+        SELECT 
+          a.id_admision, a.fecha_admision, a.motivo, a.tipo_ingreso, a.estado,
+          p.nombre, p.apellido, p.dni, p.fecha_nacimiento, p.sexo,
+          c.numero AS cama_numero,
+          h.numero AS habitacion_numero
+        FROM admision a
+        JOIN paciente p ON a.id_paciente = p.id_paciente
+        JOIN cama c ON a.id_cama_asignada = c.id_cama
+        JOIN habitacion h ON c.id_habitacion = h.id_habitacion
+        WHERE a.id_admision = ?
+      `;
+
+      // Query para el historial de evoluciones
+      const sqlEvoluciones = `
+        SELECT
+          em.fecha_evaluacion, em.diagnostico, em.tratamientos, em.alta,
+          em.presion_arterial, em.temperatura, em.frec_cardiaca, em.frec_respiratoria, em.saturacion_o2,
+          u.username AS medico_responsable
+        FROM evaluacion_medica em
+        JOIN usuario u ON em.medico_responsable = u.id_usuario
+        WHERE em.id_admision = ?
+        ORDER BY em.fecha_evaluacion DESC
+      `;
+
+      const [admisionResult, evolucionesResult] = await Promise.all([
+        connection.promise().query(sqlAdmision, [id]),
+        connection.promise().query(sqlEvoluciones, [id])
+      ]);
+
+      if (admisionResult[0].length === 0) {
+        return res.status(404).send("Admisión no encontrada.");
+      }
+
+      res.render("admision_detalle", {
+        titulo: `Detalle de Admisión`,
+        admision: admisionResult[0][0],
+        evoluciones: evolucionesResult[0],
+        bodyClass: "bg-admisiones"
+      });
+
+    } catch (err) {
+      console.error("❌ Error al obtener detalle de admisión:", err);
+      res.send("Error al cargar el detalle de la admisión.");
+    } finally {
+      if (connection) connection.release();
+    }
+  },
+
   // (Pega aquí los métodos finalizarAdmision y cancelarAdmision tal cual los tenías)
     finalizarAdmision: async (req, res) => {
     const { id } = req.params;

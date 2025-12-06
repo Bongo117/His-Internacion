@@ -13,9 +13,10 @@ router.post("/admitir", admisionesController.procesarAdmision);
 
 router.get("/admisiones", admisionesController.listarAdmisiones);
 
+router.get("/admisiones/:id/detalle", admisionesController.verDetalleAdmision);
+
 router.post("/admisiones/:id/finalizar", admisionesController.finalizarAdmision);
 
 router.post("/admisiones/:id/cancelar", admisionesController.cancelarAdmision);
 
 module.exports = router;
-

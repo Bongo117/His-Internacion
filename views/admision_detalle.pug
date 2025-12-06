@@ -1,0 +1,60 @@
+extends layout
+
+block content
+  .contenido-box
+    //- Sección de Datos Principales
+    .d-flex.justify-content-between.align-items-center.mb-3
+      h2= `${titulo}: #${admision.id_admision}`
+      span(class=`badge bg-${admision.estado === 'activa' ? 'success' : 'secondary'}`)= admision.estado.toUpperCase()
+
+    .card.mb-4
+      .card-header.fw-bold Datos del Paciente y Admisión
+      .card-body
+        .row
+          .col-md-6
+            p #[strong Paciente:] #{admision.nombre} #{admision.apellido}
+            p #[strong DNI:] #{admision.dni}
+            p #[strong Sexo:] #{admision.sexo}
+          .col-md-6
+            p #[strong Fecha Admisión:] #{new Date(admision.fecha_admision).toLocaleString('es-AR')}
+            p #[strong Motivo:] #{admision.motivo}
+            p #[strong Ubicación:] Habitación #{admision.habitacion_numero}, Cama #{admision.cama_numero}
+
+    //- Sección de Historial de Evoluciones
+    h3.mb-3 Historial de Evoluciones
+
+    if evoluciones.length > 0
+      each evo in evoluciones
+        .card.mb-3
+          .card-header.d-flex.justify-content-between
+            span #[strong Fecha:] #{new Date(evo.fecha_evaluacion).toLocaleString('es-AR')}
+            span #[strong Médico:] #{evo.medico_responsable}
+          .card-body
+            h5.card-title.text-primary Diagnóstico / Evolución
+            p.card-text.bg-light.p-2.rounded= evo.diagnostico
+            
+            h5.card-title.text-primary Tratamiento / Indicaciones
+            p.card-text.bg-light.p-2.rounded= evo.tratamientos
+
+            //- Signos Vitales
+            h6.mt-3 Signos Vitales
+            .row
+              .col-sm-4.col-md-2
+                p.mb-1 #[strong PA:] #{evo.presion_arterial || 'N/A'}
+              .col-sm-4.col-md-2
+                p.mb-1 #[strong T°:] #{evo.temperatura ? evo.temperatura + '°C' : 'N/A'}
+              .col-sm-4.col-md-2
+                p.mb-1 #[strong FC:] #{evo.frec_cardiaca ? evo.frec_cardiaca + ' lpm' : 'N/A'}
+              .col-sm-6.col-md-3
+                p.mb-1 #[strong FR:] #{evo.frec_respiratoria ? evo.frec_respiratoria + ' rpm' : 'N/A'}
+              .col-sm-6.col-md-3
+                p.mb-1 #[strong Sat O₂:] #{evo.saturacion_o2 ? evo.saturacion_o2 + '%' : 'N/A'}
+            
+            if evo.alta
+              .alert.alert-success.mt-3.py-2
+                strong 🏥 ALTA MÉDICA OTORGADA EN ESTA EVOLUCIÓN
+
+    else
+      .alert.alert-info No hay evoluciones registradas para esta admisión.
+
+    a.btn.btn-secondary(href="/admisiones") Volver al Listado
