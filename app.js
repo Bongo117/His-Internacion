@@ -30,6 +30,7 @@ const admisionesRoutes = require('./routes/Admisiones');
 const pacientesRoutes  = require('./routes/Pacientes');
 const camasRoutes      = require('./routes/Camas');
 const evaluacionesRoutes = require('./routes/Evaluaciones');
+const habitacionesRoutes = require('./routes/Habitaciones');
 
 app.get('/', (req, res) => {
   res.render('index', { titulo: 'Módulo de Admisión HIS' });
@@ -40,6 +41,7 @@ app.use('/',          admisionesRoutes);
 app.use('/pacientes', pacientesRoutes);
 app.use('/camas',     camasRoutes);
 app.use('/evaluaciones', evaluacionesRoutes);
+app.use('/habitaciones', habitacionesRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

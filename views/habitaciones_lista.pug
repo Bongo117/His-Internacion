@@ -1,0 +1,51 @@
+extends layout
+
+block content
+  .contenido-box
+    div.d-flex.justify-content-between.align-items-center.mb-4
+        h2 🏥 Mapa de Habitaciones
+        a.btn.btn-success(href="/habitaciones/nueva") + Nueva Habitación
+
+    if habitaciones.length == 0
+      .alert.alert-warning No hay habitaciones registradas.
+    else
+      .row
+        each h in habitaciones
+          // Calculamos porcentaje de ocupación para el color
+          - let ocupacion = h.camas_ocupadas || 0
+          - let total = h.total_camas || 0
+          - let colorCard = 'border-secondary'
+          - if (total > 0 && ocupacion === total) colorCard = 'border-danger' // Llena
+          - if (total > 0 && ocupacion < total && ocupacion > 0) colorCard = 'border-warning' // Mitad
+          - if (total > 0 && ocupacion === 0) colorCard = 'border-success' // Vacía
+
+          .col-md-4.mb-4
+            .card(class=colorCard).h-100.shadow-sm
+              .card-header.d-flex.justify-content-between.align-items-center
+                strong= h.ala
+                span.badge.bg-dark Hab. #{h.numero}
+              .card-body
+                h5.card-title Capacidad: #{h.capacidad} camas
+                p.card-text
+                    | Camas instaladas: #{h.total_camas}
+                    br
+                    if ocupacion > 0
+                        span.text-danger Ocupadas: #{ocupacion}
+                    else
+                        span.text-success Disponible
+                
+                if h.pacientes_nombres
+                    hr
+                    small.text-muted Ocupantes:
+                    div.fw-bold.text-primary= h.pacientes_nombres
+                else if total > 0
+                    hr
+                    small.text-success Habitación vacía
+                else 
+                    hr
+                    small.text-danger ⚠️ Sin camas físicas
+
+              .card-footer.text-center
+                // Enlace rápido para gestionar las camas de ESA habitación
+                // (Para esto necesitaríamos un filtro en camas, pero por ahora lo dejamos genérico o linkeamos a crear cama)
+                a.btn.btn-sm.btn-outline-secondary(href="/camas") 🛏️ Gestionar Camas

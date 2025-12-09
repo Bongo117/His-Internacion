@@ -1,0 +1,32 @@
+extends layout
+
+block content
+  .contenido-box
+    h2= titulo
+    if error
+        .alert.alert-danger= error
+
+    form(method="POST" action="/habitaciones/guardar")
+      .mb-3
+        label.form-label(for="ala") Ala / Sector
+        select.form-control(name="ala" required)
+            option(value="Ala Norte") Ala Norte
+            option(value="Ala Sur") Ala Sur
+            option(value="Ala Este") Ala Este
+            option(value="Ala Oeste") Ala Oeste
+            option(value="Cuidados Intensivos") Cuidados Intensivos (UTI)
+      
+      .mb-3
+        label.form-label(for="numero") Número de Habitación
+        input.form-control(type="number" name="numero" required placeholder="Ej: 104")
+
+      .mb-3
+        label.form-label(for="capacidad") Capacidad Máxima (Camas)
+        select.form-control(name="capacidad" required)
+            option(value="1") 1 (Privada)
+            option(value="2") 2 (Compartida)
+            option(value="3") 3 (Sala común pequeña)
+            option(value="4") 4 (Sala común grande)
+
+      button.btn.btn-primary(type="submit") Guardar Habitación
+      a.btn.btn-link(href="/habitaciones") Cancelar
