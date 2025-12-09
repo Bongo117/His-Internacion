@@ -11,53 +11,48 @@ block content
     else
       .row
         each h in habitaciones
-          // Lógica de colores (Semáforo)
-          - let ocupacion = h.camas_ocupadas || 0
-          - let total = h.total_camas || 0
-          - let colorCard = 'border-secondary'
-          - if (total > 0 && ocupacion === total) colorCard = 'border-danger' 
-          - if (total > 0 && ocupacion < total && ocupacion > 0) colorCard = 'border-warning'
-          - if (total > 0 && ocupacion === 0) colorCard = 'border-success'
-
           .col-md-4.mb-4
-            .card(class=colorCard).h-100.shadow-sm
+            .card.h-100.shadow-sm
               .card-header.d-flex.justify-content-between.align-items-center.bg-light
                 strong= h.ala
                 span.badge.bg-dark Hab. #{h.numero}
               
               .card-body
-                h6.card-subtitle.mb-2.text-muted Capacidad Máx: #{h.capacidad}
+                h6.card-subtitle.mb-3.text-muted Capacidad: #{h.capacidad} camas
                 
-                // Barra de progreso visual de ocupación
-                .progress.mb-3(style="height: 10px;")
-                  - let porcentaje = total > 0 ? (ocupacion / total) * 100 : 0
-                  .progress-bar(
-                    role="progressbar" 
-                    style=`width: ${porcentaje}%` 
-                    class=(ocupacion === total ? 'bg-danger' : 'bg-success')
-                  )
+                // --- LISTA DE CAMAS INTERACTIVAS ---
+                if h.camas.length === 0
+                    p.text-muted.small 🚫 Sin camas instaladas
+                else
+                    ul.list-group.list-group-flush
+                        each cama in h.camas
+                            li.list-group-item.d-flex.justify-content-between.align-items-center.px-0
+                                // Información de la cama
+                                div
+                                    strong Cama #{cama.numero}: 
+                                    
+                                    if cama.estado === 'libre'
+                                        span.badge.bg-success Libre
+                                    else if cama.estado === 'ocupada'
+                                        span.badge.bg-danger Ocupada
+                                        div.small.text-primary.mt-1 👤 #{cama.apellido}
+                                    else if cama.estado === 'higienizando'
+                                        span.badge.bg-warning.text-dark Limpieza
+                                
+                                // Acciones para la cama
+                                div
+                                    if cama.estado === 'higienizando'
+                                        form.d-inline(method="POST" action=`/habitaciones/cama/${cama.id_cama}/limpiar`)
+                                            button.btn.btn-sm.btn-outline-warning(type="submit" title="Marcar como limpia") 🧹 Limpiar
+                                    
+                                    if cama.estado === 'libre'
+                                        //- Botón para eliminar la cama (solo si está libre)
+                                        form.d-inline.ms-1(method="POST" action=`/habitaciones/cama/${cama.id_cama}/eliminar`)
+                                            button.btn.btn-sm.btn-outline-danger(type="submit" title="Eliminar cama") 🗑️
 
-                p.card-text
-                    | Camas Físicas: #{total} 
-                    br
-                    if ocupacion > 0
-                        span.text-danger Ocupadas: #{ocupacion}
-                    else
-                        span.text-success Todas Libres
-                
-                if h.pacientes_nombres
-                    hr
-                    small.text-muted Pacientes:
-                    div.fw-bold.text-primary.small= h.pacientes_nombres
-
-              .card-footer.bg-transparent
-                div.d-flex.justify-content-between.align-items-center
-                    // Botón para agregar cama automáticamente
-                    if total < h.capacidad
-                        form(method="POST" action=`/habitaciones/${h.id_habitacion}/agregar_cama`)
-                            button.btn.btn-sm.btn-outline-primary(type="submit") ➕ Instalar Cama
-                    else
-                        button.btn.btn-sm.btn-light.text-muted(disabled) Máx. alcanzado
-                    
-                    // Si quisieras ver el detalle fino (opcional, podrías quitarlo)
-                    // a.btn.btn-sm.btn-link(href="#") Detalles
+              .card-footer.bg-transparent.text-center
+                if h.camas.length < h.capacidad
+                    form(method="POST" action=`/habitaciones/${h.id_habitacion}/agregar_cama`)
+                        button.btn.btn-sm.btn-outline-primary(type="submit") ➕ Instalar Cama
+                else
+                    small.text-muted Cupo máximo de camas alcanzado
