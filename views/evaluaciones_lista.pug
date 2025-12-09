@@ -2,20 +2,29 @@ extends layout
 
 block content
   .contenido-box
-    h2 🩺 Pacientes en Internación
-    table.table.table-striped
-      thead
-        tr
-          th Paciente
-          th Ubicación
-          th Acciones
-      tbody
-        each p in pacientes
-          tr
-            td= p.apellido + ", " + p.nombre
-            td= `${p.ala} - Cama ${p.cama}`
-            td
-              a.btn.btn-primary.btn-sm(href="/evaluaciones/nueva/" + p.id_admision) 📝 Evolucionar
+    h2.mb-4 🩺 Pacientes en Internación
     
     if pacientes.length == 0
-        p.text-muted No hay pacientes internados actualmente.
+      div.alert.alert-info.text-center
+        | 📭 No hay pacientes internados actualmente para evaluar.
+    else
+      div.table-responsive
+        table.table.table-hover.align-middle
+          thead.table-light
+            tr
+              th Paciente
+              th Ubicación
+              th.text-center Acciones
+          tbody
+            each p in pacientes
+              tr
+                td
+                  div.fw-bold= p.apellido + ", " + p.nombre
+                  small.text-muted ID Admisión: #{p.id_admision}
+                td
+                  span.badge.bg-secondary.me-2= p.ala
+                  span.text-dark Cama #{p.cama}
+                td.text-center
+                  //- UN SOLO BOTÓN CENTRALIZADO
+                  a.btn.btn-outline-primary.btn-sm(href="/evaluaciones/nueva/" + p.id_admision) 
+                    | 📂 Historia Clínica

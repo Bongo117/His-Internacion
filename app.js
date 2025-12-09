@@ -31,17 +31,15 @@ const pacientesRoutes  = require('./routes/Pacientes');
 const camasRoutes      = require('./routes/Camas');
 const evaluacionesRoutes = require('./routes/Evaluaciones');
 
+app.get('/', (req, res) => {
+  res.render('index', { titulo: 'Módulo de Admisión HIS' });
+});
+
 app.use('/auth',      authRoutes);
 app.use('/',          admisionesRoutes);
 app.use('/pacientes', pacientesRoutes);
 app.use('/camas',     camasRoutes);
 app.use('/evaluaciones', evaluacionesRoutes);
-
-
-app.get('/', (req, res) => {
-  res.render('index', { titulo: 'Módulo de Admisión HIS' });
-});
-
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

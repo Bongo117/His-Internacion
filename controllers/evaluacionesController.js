@@ -20,51 +20,47 @@ module.exports = {
     }
   },
 
-  // Mostrar formulario de evolución
+  // Mostrar formulario de evolución + HISTORIAL
   mostrarFormulario: async (req, res) => {
     const { id_admision } = req.params;
     try {
-      // Traemos datos básicos para mostrar en el título
+      // 1. Datos del Paciente (Para el título)
       const [datos] = await db.promise().query(
         "SELECT p.nombre, p.apellido FROM admision a JOIN paciente p ON a.id_paciente = p.id_paciente WHERE id_admision = ?", 
+        [id_admision]
+      );
+
+      // 2. Historial de Evoluciones Previas (La novedad)
+      const [historial] = await db.promise().query(
+        "SELECT * FROM evaluacion_medica WHERE id_admision = ? ORDER BY fecha DESC",
         [id_admision]
       );
       
       res.render("evaluacion_form", { 
         titulo: `Evolucionar a ${datos[0].nombre} ${datos[0].apellido}`, 
-        id_admision 
+        id_admision,
+        historial // <--- Pasamos el historial a la vista
       });
     } catch (error) {
+      console.error(error);
       res.redirect("/evaluaciones");
     }
   },
 
   // Guardar la evolución (Y dar de alta si se marca el checkbox)
   guardarEvolucion: async (req, res) => {
-    const { 
-        id_admision, diagnostico, tratamientos, alta_medica,
-        presion_arterial, temperatura, frec_cardiaca, frec_respiratoria, saturacion_o2
-    } = req.body;
+    const { id_admision, diagnostico, tratamientos, alta_medica } = req.body;
     let connection;
 
     try {
         connection = await db.promise().getConnection();
         await connection.beginTransaction();
 
-        // Preparamos los valores de signos vitales. Si vienen vacíos, los guardamos como NULL.
-        const sv = {
-            presion: presion_arterial || null,
-            temp: temperatura || null,
-            fc: frec_cardiaca || null,
-            fr: frec_respiratoria || null,
-            sat: saturacion_o2 || null
-        };
-
         // 1. Guardar la evaluación médica (Historial clínico)
         await connection.query(
-            `INSERT INTO evaluacion_medica (id_admision, diagnostico, tratamientos, alta, medico_responsable, presion_arterial, temperatura, frec_cardiaca, frec_respiratoria, saturacion_o2) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [id_admision, diagnostico, tratamientos, (alta_medica ? 1 : 0), req.session.user.id, sv.presion, sv.temp, sv.fc, sv.fr, sv.sat]
+            `INSERT INTO evaluacion_medica (id_admision, diagnostico, tratamientos, alta, medico_responsable) 
+             VALUES (?, ?, ?, ?, ?)`,
+            [id_admision, diagnostico, tratamientos, (alta_medica ? 1 : 0), req.session.user.id] // Asumimos que el usuario logueado es el médico
         );
 
         // 2. Si marcó "Alta Médica", cerramos la admisión y liberamos la cama
