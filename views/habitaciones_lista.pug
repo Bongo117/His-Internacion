@@ -11,41 +11,53 @@ block content
     else
       .row
         each h in habitaciones
-          // Calculamos porcentaje de ocupación para el color
+          // Lógica de colores (Semáforo)
           - let ocupacion = h.camas_ocupadas || 0
           - let total = h.total_camas || 0
           - let colorCard = 'border-secondary'
-          - if (total > 0 && ocupacion === total) colorCard = 'border-danger' // Llena
-          - if (total > 0 && ocupacion < total && ocupacion > 0) colorCard = 'border-warning' // Mitad
-          - if (total > 0 && ocupacion === 0) colorCard = 'border-success' // Vacía
+          - if (total > 0 && ocupacion === total) colorCard = 'border-danger' 
+          - if (total > 0 && ocupacion < total && ocupacion > 0) colorCard = 'border-warning'
+          - if (total > 0 && ocupacion === 0) colorCard = 'border-success'
 
           .col-md-4.mb-4
             .card(class=colorCard).h-100.shadow-sm
-              .card-header.d-flex.justify-content-between.align-items-center
+              .card-header.d-flex.justify-content-between.align-items-center.bg-light
                 strong= h.ala
                 span.badge.bg-dark Hab. #{h.numero}
+              
               .card-body
-                h5.card-title Capacidad: #{h.capacidad} camas
+                h6.card-subtitle.mb-2.text-muted Capacidad Máx: #{h.capacidad}
+                
+                // Barra de progreso visual de ocupación
+                .progress.mb-3(style="height: 10px;")
+                  - let porcentaje = total > 0 ? (ocupacion / total) * 100 : 0
+                  .progress-bar(
+                    role="progressbar" 
+                    style=`width: ${porcentaje}%` 
+                    class=(ocupacion === total ? 'bg-danger' : 'bg-success')
+                  )
+
                 p.card-text
-                    | Camas instaladas: #{h.total_camas}
+                    | Camas Físicas: #{total} 
                     br
                     if ocupacion > 0
                         span.text-danger Ocupadas: #{ocupacion}
                     else
-                        span.text-success Disponible
+                        span.text-success Todas Libres
                 
                 if h.pacientes_nombres
                     hr
-                    small.text-muted Ocupantes:
-                    div.fw-bold.text-primary= h.pacientes_nombres
-                else if total > 0
-                    hr
-                    small.text-success Habitación vacía
-                else 
-                    hr
-                    small.text-danger ⚠️ Sin camas físicas
+                    small.text-muted Pacientes:
+                    div.fw-bold.text-primary.small= h.pacientes_nombres
 
-              .card-footer.text-center
-                // Enlace rápido para gestionar las camas de ESA habitación
-                // (Para esto necesitaríamos un filtro en camas, pero por ahora lo dejamos genérico o linkeamos a crear cama)
-                a.btn.btn-sm.btn-outline-secondary(href="/camas") 🛏️ Gestionar Camas
+              .card-footer.bg-transparent
+                div.d-flex.justify-content-between.align-items-center
+                    // Botón para agregar cama automáticamente
+                    if total < h.capacidad
+                        form(method="POST" action=`/habitaciones/${h.id_habitacion}/agregar_cama`)
+                            button.btn.btn-sm.btn-outline-primary(type="submit") ➕ Instalar Cama
+                    else
+                        button.btn.btn-sm.btn-light.text-muted(disabled) Máx. alcanzado
+                    
+                    // Si quisieras ver el detalle fino (opcional, podrías quitarlo)
+                    // a.btn.btn-sm.btn-link(href="#") Detalles

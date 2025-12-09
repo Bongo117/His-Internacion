@@ -20,26 +20,21 @@ html(lang="es")
                 i.bi.bi-box-arrow-in-right.me-1
                 | Iniciar sesión
           else
+            //- Menú principal reordenado para un flujo de trabajo más lógico
             li.nav-item
-              a.nav-link(href="/pacientes")
-                i.bi.bi-people-fill.me-1
-                | Pacientes
+              a.nav-link(href="/admisiones") 📝 Admisiones
             li.nav-item
-              a.nav-link(href="/admisiones")
-                i.bi.bi-card-list.me-1
-                | Admisiones
+              a.nav-link(href="/pacientes") 👥 Pacientes
             li.nav-item
-              a.nav-link(href="/evaluaciones")
-                i.bi.bi-pencil-square.me-1
-                | Evoluciones
+              a.nav-link(href="/habitaciones") 🏥 Habitaciones
             li.nav-item
-              a.nav-link(href="/habitaciones")
-                i.bi.bi-door-closed.me-1
-                | Habitaciones
-            li.nav-item
-              a.nav-link(href="/camas")
-                i.bi.bi-lamp-fill.me-1
-                | Camas
+              a.nav-link(href="/evaluaciones") 🩺 Evoluciones
+            
+            //- El módulo de camas ahora se gestiona desde la vista de Habitaciones.
+            //- Se comenta el acceso directo para simplificar la navegación.
+            //- li.nav-item
+            //-   a.nav-link(href="/camas") 🛏️ Camas
+
             li.nav-item.dropdown
               a.nav-link.dropdown-toggle(href="#", id="userDropdown", role="button", data-bs-toggle="dropdown", aria-expanded="false")
                 i.bi.bi-person-circle.me-1

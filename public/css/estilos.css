@@ -126,3 +126,11 @@ small.text-danger {
   color: #000000;
   line-height: 1.5;
 }
+
+.bg-habitaciones {
+    background: url('../cama.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+}

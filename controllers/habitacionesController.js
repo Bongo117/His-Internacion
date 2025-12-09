@@ -27,7 +27,8 @@ module.exports = {
 
       res.render("habitaciones_lista", { 
         titulo: "Gestión de Habitaciones", 
-        habitaciones 
+        habitaciones,
+        bodyClass: "bg-habitaciones" // <--- AGREGA ESTA LÍNEA
       });
     } catch (err) {
       console.error(err);
@@ -56,6 +57,35 @@ module.exports = {
         titulo: "Nueva Habitación", 
         error: "Error al crear la habitación. Verifique que el número no esté duplicado." 
       });
+    }
+  },
+
+  // --- AGREGAR CAMA RÁPIDA A UNA HABITACIÓN ---
+  agregarCama: async (req, res) => {
+    const { id_habitacion } = req.params;
+    
+    try {
+      // 1. Buscamos cuál es el último número de cama en esa habitación para sumar 1
+      //    Se castea a UNSIGNED para que MAX() ordene numéricamente ('10' > '9') y no por texto.
+      const [camas] = await db.promise().query(
+        "SELECT MAX(CAST(numero AS UNSIGNED)) as max_num FROM cama WHERE id_habitacion = ?", 
+        [id_habitacion]
+      );
+      
+      const nuevoNumero = (camas[0].max_num || 0) + 1;
+
+      // 2. Insertamos la cama nueva
+      await db.promise().query(
+        "INSERT INTO cama (id_habitacion, numero, estado) VALUES (?, ?, 'libre')",
+        [id_habitacion, nuevoNumero.toString()] // Se guarda como string
+      );
+
+      // 3. Volvemos al tablero
+      res.redirect("/habitaciones");
+
+    } catch (err) {
+      console.error(err);
+      res.send("Error al agregar cama.");
     }
   }
 };
