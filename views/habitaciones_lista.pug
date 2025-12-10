@@ -38,17 +38,17 @@ block content
                                         div.small.text-primary.mt-1 👤 #{cama.apellido}
                                     else if cama.estado === 'higienizando'
                                         span.badge.bg-warning.text-dark Limpieza
+                                    else
+                                        span.badge.bg-secondary= cama.estado
                                 
-                                // Acciones para la cama
+                                // Acciones: Limpiar (Rápido) o Editar (Detallado)
                                 div
                                     if cama.estado === 'higienizando'
-                                        form.d-inline(method="POST" action=`/habitaciones/cama/${cama.id_cama}/limpiar`)
-                                            button.btn.btn-sm.btn-outline-warning(type="submit" title="Marcar como limpia") 🧹 Limpiar
+                                        form(method="POST" action=`/habitaciones/cama/${cama.id_cama}/limpiar` style="display:inline")
+                                            button.btn.btn-sm.btn-outline-warning.me-1(type="submit" title="Marcar como limpia") 🧹
                                     
-                                    if cama.estado === 'libre'
-                                        //- Botón para eliminar la cama (solo si está libre)
-                                        form.d-inline.ms-1(method="POST" action=`/habitaciones/cama/${cama.id_cama}/eliminar`)
-                                            button.btn.btn-sm.btn-outline-danger(type="submit" title="Eliminar cama") 🗑️
+                                    //- BOTÓN NUEVO: Editar Cama (Lleva al controlador de Camas)
+                                    a.btn.btn-sm.btn-outline-secondary(href=`/camas/editar/${cama.id_cama}` title="Editar Estado/Detalles") ✏️
 
               .card-footer.bg-transparent.text-center
                 if h.camas.length < h.capacidad

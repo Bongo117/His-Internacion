@@ -1,60 +1,21 @@
 extends layout
 
 block content
-  .fondo-camas
   .contenido-box
-    h1= titulo
-
-    form(
-      method="POST",
-      action=`/camas/editar/${cama.id_cama}`,
-      id="formCama",
-      novalidate
-    )
+    h2 ✏️ Editar Cama
+    
+    form(method="POST" action=`/camas/editar/${cama.id_cama}`)
       .mb-3
-        label(for="numero") Número de cama
-        input.form-control(
-          type="number",
-          name="numero",
-          required,
-          min="1",
-          value=cama.numero
-        )
-        small.text-danger#numeroError
+        label.form-label Número de Cama
+        input.form-control(type="number" name="numero" value=cama.numero required)
 
       .mb-3
-        label(for="estado") Estado actual
-        select.form-control(name="estado", required)
-          option(value="") Seleccionar...
-          option(value="libre", selected=cama.estado === 'libre') Libre
-          option(value="ocupada", selected=cama.estado === 'ocupada') Ocupada
-          option(value="higienizando", selected=cama.estado === 'higienizando') Higienizando
-        small.text-danger#estadoError
+        label.form-label Estado Actual
+        select.form-select(name="estado")
+            option(value="libre" selected=cama.estado==='libre') 🟢 Libre
+            option(value="ocupada" selected=cama.estado==='ocupada') 🔴 Ocupada
+            option(value="higienizando" selected=cama.estado==='higienizando') 🧹 Higienizando
+            option(value="reparacion" selected=cama.estado==='reparacion') 🔧 En Reparación
 
-      button.btn.btn-primary(type="submit") Guardar cambios
-      a.btn.btn-secondary(href="/camas") Volver al listado
-
-  script.
-    document.getElementById("formCama").addEventListener("submit", function(event) {
-      let valido = true;
-
-      document.querySelectorAll("small.text-danger").forEach(el => el.textContent = "");
-
-      const numero = document.getElementsByName("numero")[0];
-      const estado = document.getElementsByName("estado")[0];
-
-      if (!numero.value.trim()) {
-        document.getElementById("numeroError").textContent = "⚠️ Este campo es obligatorio.";
-        valido = false;
-      }
-
-      if (!estado.value.trim()) {
-        document.getElementById("estadoError").textContent = "⚠️ Seleccioná un estado válido.";
-        valido = false;
-      }
-
-      if (!valido) {
-        event.preventDefault();
-        alert("⚠️ Por favor corregí los errores antes de continuar.");
-      }
-    });
+      button.btn.btn-primary(type="submit") Guardar Cambios
+      a.btn.btn-link(href="/habitaciones") Cancelar

@@ -145,66 +145,44 @@ module.exports = {
     }
   },
 
+  // Mostrar formulario de edición
   mostrarFormularioEditar: async (req, res) => {
     const { id } = req.params;
-    let connection;
     try {
-      connection = await new Promise((resolve, reject) => {
-        db.getConnection((err, conn) => {
-          if (err) reject(err);
-          else resolve(conn);
-        });
-      });
-
-      const [resultados] = await connection.promise().query(
-        "SELECT * FROM cama WHERE id_cama = ?",
-        [id]
-      );
-
-      if (resultados.length === 0) {
-        return res.send("Cama no encontrada.");
-      }
+      const [camas] = await db.promise().query("SELECT * FROM cama WHERE id_cama = ?", [id]);
+      
+      if (camas.length === 0) return res.redirect("/habitaciones");
 
       res.render("camas_editar", {
         titulo: "Editar Cama",
-        cama: resultados[0],
-        bodyClass: "bg-camas"
+        cama: camas[0],
+        bodyClass: "bg-habitaciones"
       });
     } catch (err) {
-      console.error("Error al obtener cama:", err);
-      res.send("Error al obtener cama.");
-    } finally {
-      if (connection) connection.release();
+      console.error(err);
+      res.send("Error al cargar cama");
     }
   },
 
+  // Guardar los cambios (Aquí permitimos cambiar el estado manualmente)
   actualizarCama: async (req, res) => {
     const { id } = req.params;
-    const { numero, estado } = req.body;
-    if (!numero.trim() || !estado.trim()) {
+    const { numero, estado } = req.body; // Recibimos el estado nuevo
+
+    if (!numero?.trim() || !estado?.trim()) {
       return res.send("⚠️ Todos los campos son obligatorios.");
     }
 
-    let connection;
     try {
-      connection = await new Promise((resolve, reject) => {
-        db.getConnection((err, conn) => {
-          if (err) reject(err);
-          else resolve(conn);
-        });
-      });
-
-      await connection.promise().query(
+      await db.promise().query(
         "UPDATE cama SET numero = ?, estado = ? WHERE id_cama = ?",
         [numero, estado, id]
       );
-
-      res.redirect("/camas?msg=Edición de cama guardada");
+      // Al terminar, volvemos al tablero general que es más útil
+      res.redirect("/habitaciones");
     } catch (err) {
-      console.error("Error al actualizar cama:", err);
-      res.send("Error al actualizar cama.");
-    } finally {
-      if (connection) connection.release();
+      console.error(err);
+      res.send("Error al actualizar cama");
     }
   }
 };
