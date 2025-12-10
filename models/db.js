@@ -2,9 +2,9 @@ require('dotenv').config();
 const mysql = require('mysql2');
 
 const pool = mysql.createPool({
-  host: '127.0.0.1',      // Forzamos IP para evitar conflictos de Windows
+  host: '127.0.0.1',      // Forzar IP para evitar conflictos de Windows
   user: 'root',
-  password: '',           // <--- CLAVE VACÍA (La acabamos de limpiar)
+  password: '',           
   database: 'his_internacion',
   port: 3306,
   waitForConnections: true,
