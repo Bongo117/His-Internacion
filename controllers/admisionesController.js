@@ -414,5 +414,108 @@ module.exports = {
     } finally {
         if (connection) connection.release();
     }
+  },
+
+  // --- MÓDULO DE IDENTIFICACIÓN (FUSIÓN DE HISTORIAS) ---
+
+  // 1. Mostrar formulario de identificación para un paciente NN específico
+  formularioIdentificar: async (req, res) => {
+    const { id_admision } = req.params;
+    try {
+        const [adm] = await db.promise().query(`
+            SELECT a.id_admision, a.fecha_admision, p.dni, p.nombre, p.apellido 
+            FROM admision a
+            JOIN paciente p ON a.id_paciente = p.id_paciente
+            WHERE a.id_admision = ?`, [id_admision]);
+
+        if (adm.length === 0) return res.redirect('/admisiones');
+
+        res.render("identificar", { 
+            titulo: "Identificar Paciente NN", 
+            pacienteNN: adm[0] 
+        });
+    } catch (err) {
+        console.error(err);
+        res.send("Error al cargar formulario");
+    }
+  },
+
+  // 2. Procesar la fusión: Mover la admisión del NN al Paciente Real
+  procesarIdentificacion: async (req, res) => {
+    const { id_admision, dni_real } = req.body;
+    let connection;
+
+    try {
+        connection = await db.promise().getConnection();
+        await connection.beginTransaction();
+
+        // A. Buscar al paciente real por DNI
+        const [pacienteReal] = await connection.query(
+            "SELECT id_paciente, nombre, apellido FROM paciente WHERE dni = ?", 
+            [dni_real]
+        );
+
+        if (pacienteReal.length === 0) {
+            throw new Error(`El DNI ${dni_real} no existe en la base de datos. Primero debe registrar al paciente real.`);
+        }
+
+        const idReal = pacienteReal[0].id_paciente;
+
+        // B. Obtener el ID del paciente NN que vamos a eliminar (antes de cambiarlo)
+        const [admisionNN] = await connection.query(
+            "SELECT id_paciente FROM admision WHERE id_admision = ?",
+            [id_admision]
+        );
+
+        if (admisionNN.length === 0) {
+            throw new Error("La admisión a identificar no fue encontrada.");
+        }
+        const idPacienteNN = admisionNN[0].id_paciente;
+
+        // C. REALIZAR LA FUSIÓN (UPDATE)
+        // Cambiamos el dueño de la admisión. Todo lo que pasó (evaluaciones, cama, etc) 
+        // ahora pertenece al paciente real.
+        await connection.query(
+            "UPDATE admision SET id_paciente = ? WHERE id_admision = ?",
+            [idReal, id_admision]
+        );
+
+        // D. ELIMINAR EL REGISTRO DEL PACIENTE NN
+        // Una vez que la admisión ya no lo referencia, podemos borrarlo para limpiar la BD.
+        await connection.query(
+            "DELETE FROM paciente WHERE id_paciente = ?",
+            [idPacienteNN]
+        );
+
+        await connection.commit();
+        console.log(`✅ FUSIÓN EXITOSA: Admisión ${id_admision} transferida a ${pacienteReal[0].apellido}`);
+        console.log(`🗑️ LIMPIEZA: Paciente NN temporal (ID: ${idPacienteNN}) eliminado de la base de datos.`);
+        res.redirect('/admisiones');
+
+    } catch (error) {
+        if (connection) await connection.rollback(); // Deshacer cambios si algo falló
+        console.error(error);
+
+        // Para una mejor experiencia de usuario, en lugar de una página de error simple,
+        // volvemos a renderizar el formulario de identificación mostrando el error.
+        try {
+            const [adm] = await db.promise().query(`
+                SELECT a.id_admision, a.fecha_admision, p.dni, p.nombre, p.apellido 
+                FROM admision a
+                JOIN paciente p ON a.id_paciente = p.id_paciente
+                WHERE a.id_admision = ?`, [id_admision]);
+
+            res.render("identificar", { 
+                titulo: "Identificar Paciente NN", 
+                pacienteNN: adm.length > 0 ? adm[0] : { id_admision },
+                error: error.message // Pasamos el mensaje de error a la vista
+            });
+        } catch (renderError) {
+            console.error("Error al re-renderizar formulario de identificación:", renderError);
+            res.send(`<h1>Error en Identificación</h1><p>${error.message}</p><a href='/admisiones'>Volver</a>`);
+        }
+    } finally {
+        if (connection) connection.release();
+    }
   }
 };

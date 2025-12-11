@@ -27,4 +27,11 @@ router.post("/admisiones/:id/cancelar", tieneRol(['admin']), admisionesControlle
 // Esta suele ser abierta a médicos también en caso de urgencia
 router.post("/admitir/emergencia", tieneRol(['medico', 'enfermero', 'admin']), admisionesController.ingresoEmergencia);
 
+// Rutas para Identificar Pacientes NN
+// GET: Muestra el formulario (requiere ID de la admisión)
+router.get("/admisiones/identificar/:id_admision", tieneRol(['medico', 'enfermero', 'admin']), admisionesController.formularioIdentificar);
+
+// POST: Procesa el cambio
+router.post("/admisiones/identificar", tieneRol(['medico', 'enfermero', 'admin']), admisionesController.procesarIdentificacion);
+
 module.exports = router;

@@ -17,6 +17,9 @@ router.post("/nuevo", pacientesController.crearPaciente);
 
 router.get("/", pacientesController.listarPacientes);
 
+// API para buscar pacientes por DNI (devuelve JSON para AJAX)
+router.get("/api/buscar/:dni", pacientesController.buscarPacientePorDNI);
+
 
 router.get("/editar/:id", pacientesController.mostrarFormularioEditar);
 

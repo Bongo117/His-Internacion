@@ -25,13 +25,7 @@ module.exports = {
 
     let connection;
     try {
-      connection = await new Promise((resolve, reject) => {
-        db.getConnection((err, conn) => {
-          if (err) reject(err);
-          else resolve(conn);
-        });
-      });
-
+      connection = await db.promise().getConnection();
       const sql = `
         INSERT INTO paciente
         (nombre, apellido, dni, fecha_nacimiento, sexo, telefono, direccion, 
@@ -45,7 +39,7 @@ module.exports = {
         obra_social, nro_afiliado
       ];
 
-      await connection.promise().query(sql, valores);
+      await connection.query(sql, valores);
       res.redirect("/pacientes");
     } catch (err) {
       console.error("❌ Error al crear paciente:", err);
@@ -67,14 +61,8 @@ module.exports = {
 
     let connection;
     try {
-      connection = await new Promise((resolve, reject) => {
-        db.getConnection((err, conn) => {
-          if (err) reject(err);
-          else resolve(conn);
-        });
-      });
-
-      const [pacientes] = await connection.promise().query(sql, params);
+      connection = await db.promise().getConnection();
+      const [pacientes] = await connection.query(sql, params);
       
       res.render("listar_pacientes", {
         titulo: "Listado de Pacientes",
@@ -97,18 +85,36 @@ module.exports = {
     }
   },
 
+  buscarPacientePorDNI: async (req, res) => {
+    const { dni } = req.params;
+    let connection;
+    try {
+      // Usamos el pool de promesas para obtener una conexión
+      connection = await db.promise().getConnection();
+      
+      const [pacientes] = await connection.query(
+        "SELECT id_paciente, dni, nombre, apellido FROM paciente WHERE dni LIKE ?",
+        [`%${dni}%`]
+      );
+      
+      // Devolvemos los resultados como JSON
+      res.json(pacientes);
+
+    } catch (err) {
+      console.error("❌ Error al buscar paciente por DNI (API):", err);
+      res.status(500).json({ error: "Error en el servidor al buscar paciente." });
+    } finally {
+      if (connection) connection.release();
+    }
+  },
+
   mostrarFormularioEditar: async (req, res) => {
     const { id } = req.params;
     let connection;
     try {
-      connection = await new Promise((resolve, reject) => {
-        db.getConnection((err, conn) => {
-          if (err) reject(err);
-          else resolve(conn);
-        });
-      });
+      connection = await db.promise().getConnection();
 
-      const [resultados] = await connection.promise().query(
+      const [resultados] = await connection.query(
         'SELECT * FROM paciente WHERE id_paciente = ?',
         [id]
       );
@@ -148,13 +154,7 @@ module.exports = {
 
     let connection;
     try {
-      connection = await new Promise((resolve, reject) => {
-        db.getConnection((err, conn) => {
-          if (err) reject(err);
-          else resolve(conn);
-        });
-      });
-
+      connection = await db.promise().getConnection();
       const sql = `
         UPDATE paciente SET
           nombre = ?, apellido = ?, dni = ?, fecha_nacimiento = ?, sexo = ?,
@@ -169,7 +169,7 @@ module.exports = {
         obra_social, nro_afiliado, id
       ];
 
-      await connection.promise().query(sql, valores);
+      await connection.query(sql, valores);
       res.redirect("/pacientes");
     } catch (err) {
       console.error("❌ Error al actualizar paciente:", err);
@@ -183,13 +183,7 @@ module.exports = {
     const { id } = req.params;
     let connection;
     try {
-      connection = await new Promise((resolve, reject) => {
-        db.getConnection((err, conn) => {
-          if (err) reject(err);
-          else resolve(conn);
-        });
-      });
-
+      connection = await db.promise().getConnection();
       const sql = `
         SELECT 
           a.id_admision,
@@ -206,7 +200,7 @@ module.exports = {
         ORDER BY a.fecha_admision DESC
       `;
       
-      const [admisiones] = await connection.promise().query(sql, [id]);
+      const [admisiones] = await connection.query(sql, [id]);
       
       res.render("paciente_admisiones", {
         titulo: `Admisiones de Paciente #${id}`,
@@ -226,26 +220,21 @@ module.exports = {
     const { id } = req.params;
     let connection;
     try {
-      connection = await new Promise((resolve, reject) => {
-        db.getConnection((err, conn) => {
-          if (err) reject(err);
-          else resolve(conn);
-        });
-      });
+      connection = await db.promise().getConnection();
 
-      // Verificar admisiones activas
-      const [admisiones] = await connection.promise().query(
-        `SELECT * FROM admision
-         WHERE id_paciente = ? AND estado = 'activa'`,
+      // Verificar si el paciente tiene CUALQUIER admisión (activa o pasada)
+      const [admisiones] = await connection.query(
+        `SELECT id_admision FROM admision WHERE id_paciente = ? LIMIT 1`,
         [id]
       );
 
       if (admisiones.length > 0) {
-        return res.redirect("/pacientes?error=No se puede eliminar un paciente con admisión activa.");
+        return res.redirect("/pacientes?error=No se puede eliminar un paciente con historial de admisiones. Por seguridad, los pacientes con historial no se eliminan.");
       }
 
+      // Si el paciente no tiene historial, se puede eliminar.
       // Eliminar paciente
-      await connection.promise().query(
+      await connection.query(
         'DELETE FROM paciente WHERE id_paciente = ?',
         [id]
       );

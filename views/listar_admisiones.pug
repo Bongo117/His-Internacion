@@ -18,8 +18,15 @@ block content
           th Acciones
       tbody
         each admision in admisiones
-          tr
-            td= admision.nombre + ' ' + admision.apellido
+          //- Detectar si es un paciente NN (por nombre o DNI temporal)
+          - let esNN = admision.nombre === 'IDENTIDAD' && admision.apellido === 'DESCONOCIDA'
+          
+          tr(class=esNN ? 'table-warning' : '')
+            td
+              if esNN
+                strong.text-danger 🚨 PACIENTE NN (Sin Identificar)
+              else
+                = admision.nombre + ' ' + admision.apellido
             td= new Date(admision.fecha_admision).toLocaleDateString('es-AR')
             td= admision.motivo
             td= admision.tipo_ingreso
@@ -28,20 +35,32 @@ block content
             td= admision.estado
             td 
               .d-flex.flex-column.gap-2
+                //- El botón de detalle siempre está disponible
                 a.btn.btn-info.btn-sm.w-100(href=`/admisiones/${admision.id_admision}/detalle`)
                   i.bi.bi-eye-fill.me-1
                   | Ver Detalle
+
                 if admision.estado === 'activa'
+                  //- Si es NN, la acción principal es Identificar
+                  if esNN
+                    a.btn.btn-danger.btn-sm.w-100.fw-bold(href=`/admisiones/identificar/${admision.id_admision}`) 
+                      i.bi.bi-person-vcard.me-1
+                      | IDENTIFICAR
+                  
+                  //- Siempre se puede evolucionar si está activa
                   a.btn.btn-primary.btn-sm.w-100(href=`/evaluaciones/nueva/${admision.id_admision}`)
                     i.bi.bi-pencil-square.me-1
                     | Evolucionar
-                  form(method="POST", action=`/admisiones/${admision.id_admision}/finalizar`)
-                    button.btn.btn-danger.btn-sm.w-100(type="submit", onclick="return confirm('¿Finalizar esta admisión?');")
-                      i.bi.bi-check-circle-fill.me-1
-                      | Finalizar
-                  form(method="POST", action=`/admisiones/${admision.id_admision}/cancelar`)
-                    button.btn.btn-secondary.btn-sm.w-100(type="submit", onclick="return confirm('¿Cancelar esta admisión?');")
-                      i.bi.bi-x-circle-fill.me-1
-                      | Cancelar
+
+                  //- Si NO es NN, se puede finalizar/cancelar
+                  if !esNN
+                    form(method="POST", action=`/admisiones/${admision.id_admision}/finalizar`)
+                      button.btn.btn-danger.btn-sm.w-100(type="submit", onclick="return confirm('¿Finalizar esta admisión?');")
+                        i.bi.bi-check-circle-fill.me-1
+                        | Finalizar
+                    form(method="POST", action=`/admisiones/${admision.id_admision}/cancelar`)
+                      button.btn.btn-secondary.btn-sm.w-100(type="submit", onclick="return confirm('¿Cancelar esta admisión?');")
+                        i.bi.bi-x-circle-fill.me-1
+                        | Cancelar
 
     a.btn.btn-secondary.mt-3(href="/") Volver al inicio
