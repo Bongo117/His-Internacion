@@ -4,6 +4,30 @@ block content
   .fondo-admisiones
   .contenido-box
     h1.text-success.mb-4= titulo
+    //- --- SECCIÓN DE EMERGENCIA (SHOCKROOM) ---
+    .card.mb-5.border-danger.shadow
+        .card-header.bg-danger.text-white.d-flex.justify-content-between.align-items-center
+            strong 🚨 PROTOCOLO DE EMERGENCIA (SHOCKROOM)
+            span.badge.bg-white.text-danger Prioridad Alta
+        .card-body.bg-light
+            p.mb-2.small.text-danger 
+                strong ⚠️ ATENCIÓN: 
+                | Utilice esta opción ÚNICAMENTE cuando el paciente no pueda ser identificado y requiera internación inmediata. Se generará una identidad temporal (NN).
+            
+            form.row.g-3(method="POST", action="/admitir/emergencia")
+                .col-md-5
+                    label.form-label.fw-bold(for="cama_urgencia") 🛏️ Asignar Cama U.T.I / Guardia
+                    select.form-select#cama_urgencia(name="id_cama_asignada", required)
+                        option(value="") -- Seleccionar Cama Libre --
+                        each cama in camas
+                            option(value=cama.id_cama)= `Cama ${cama.numero} (Hab. ${cama.habitacion_numero})`
+                
+                .col-md-5
+                    label.form-label.fw-bold(for="motivo_urgencia") 📝 Motivo de Ingreso (Breve)
+                    input.form-control#motivo_urgencia(type="text", name="motivo", placeholder="Ej: Politraumatismo, ACV, Inconsciente...", required)
+
+                .col-md-2.d-flex.align-items-end
+                    button.btn.btn-danger.w-100.fw-bold(type="submit") ⚡ INGRESAR YA
     p Aquí podrás completar la admisión de un paciente.
     
     if error

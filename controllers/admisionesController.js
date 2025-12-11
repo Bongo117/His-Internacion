@@ -347,5 +347,72 @@ module.exports = {
     } finally {
       if (connection) connection.release();
     }
+  },
+
+  // --- INGRESO DE EMERGENCIA (PROTOCOLO SHOCKROOM) ---
+  ingresoEmergencia: async (req, res) => {
+    const { id_cama_asignada, motivo } = req.body;
+    let connection;
+
+    try {
+        // 1. Obtener conexión del pool
+        connection = await new Promise((resolve, reject) => {
+            db.getConnection((err, conn) => (err ? reject(err) : resolve(conn)));
+        });
+
+        // 2. INICIO DE TRANSACCIÓN CRÍTICA
+        await connection.promise().beginTransaction();
+
+        try {
+            // A. Generar Identidad Temporal (NN)
+            // Usamos la fecha en milisegundos para garantizar que el DNI sea único siempre
+            const timestamp = Date.now(); 
+            const dniTemporal = `NN-${timestamp}`; 
+            
+            // B. Insertar Paciente Fantasma
+            // DEFENSA: "Creamos un registro de paciente 'placeholder' para mantener la
+            // integridad referencial sin detener la atención médica."
+            const [resultPaciente] = await connection.promise().query(
+                `INSERT INTO paciente 
+                (dni, nombre, apellido, fecha_nacimiento, sexo, telefono, direccion, contacto_emergencia, obra_social, nro_afiliado)
+                VALUES (?, 'IDENTIDAD', 'DESCONOCIDA', NOW(), 'X', '000-000', 'Sin datos', 'SAME / Policía', 'Estado', 'S/D')`,
+                [dniTemporal]
+            );
+            
+            const idNuevoPaciente = resultPaciente.insertId;
+
+            // C. Crear la Admisión de Urgencia
+            await connection.promise().query(
+                `INSERT INTO admision 
+                (id_paciente, fecha_admision, motivo, tipo_ingreso, id_cama_asignada, estado)
+                VALUES (?, NOW(), ?, 'emergencia', ?, 'activa')`,
+                [idNuevoPaciente, motivo || "Ingreso por Guardia / Shockroom", id_cama_asignada]
+            );
+
+            // D. Bloquear la cama inmediatamente
+            await connection.promise().query(
+                "UPDATE cama SET estado = 'ocupada' WHERE id_cama = ?", 
+                [id_cama_asignada]
+            );
+
+            // E. Confirmar todo
+            await connection.promise().commit();
+            
+            console.log(`🚨 EMERGENCIA: Paciente NN ingresado con ID ${idNuevoPaciente}`);
+            res.redirect('/admisiones');
+
+        } catch (error) {
+            // Si algo falla, deshacemos todo (Rollback)
+            await connection.promise().rollback();
+            console.error("❌ Error crítico en emergencia:", error);
+            res.send(`<h1>Error Crítico de Sistema</h1><p>${error.message}</p><a href='/admitir'>Volver</a>`);
+        }
+
+    } catch (err) {
+        console.error("Error de conexión:", err);
+        res.send("Error de conexión a Base de Datos");
+    } finally {
+        if (connection) connection.release();
+    }
   }
 };

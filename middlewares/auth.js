@@ -27,9 +27,12 @@ module.exports = {
 
             // Si no tiene permiso:
             console.warn(`⛔ Acceso denegado: Usuario ${req.session.user.username} intentó entrar a zona restringida.`);
-            return res.status(403).render('index', { 
-                titulo: 'Error de Permisos',
-                error: '⛔ No tienes autorización para realizar esta acción.'
+            // Se renderiza una vista específica para errores de permisos,
+            // mostrando un mensaje claro en rojo y ocultando el contenido normal de la página.
+            return res.status(403).render('acceso_denegado', {
+                titulo: 'Acceso Denegado',
+                mensaje: `No tienes los permisos necesarios para realizar esta acción. El rol de tu usuario ('${req.session.user.rol}') no está autorizado.`,
+                sugerencia: 'Por favor, inicia sesión con un usuario que tenga los permisos adecuados.'
             });
         }
     }

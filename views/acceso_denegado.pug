@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  // Usamos un fondo similar para mantener consistencia visual
+  .fondo-admisiones
+  .container.py-5
+    .row.justify-content-center
+      .col-md-8
+        // Tarjeta de error prominente en rojo que oculta el resto del contenido
+        .card.border-danger.shadow-lg
+          .card-header.bg-danger.text-white
+            h4.mb-0 🚨 #{titulo}
+          .card-body.text-center
+            p.lead.mt-3 #{mensaje}
+            p.text-muted #{sugerencia}
+            hr
+            .d-flex.justify-content-center.align-items-center.mt-4
+              a.btn.btn-secondary(href="javascript:history.back()") Volver atrás
+              span.mx-3 o
+              a.btn.btn-warning(href="/auth/logout") Cambiar de Usuario
