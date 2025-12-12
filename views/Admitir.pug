@@ -28,108 +28,118 @@ block content
 
                 .col-md-2.d-flex.align-items-end
                     button.btn.btn-danger.w-100.fw-bold(type="submit") ⚡ INGRESAR YA
-    p Aquí podrás completar la admisión de un paciente.
-    
+
     if error
       div.alert.alert-warning= error
 
-    form(method="POST", action="/admitir")
-      .mb-3
-        label.form-label(for="id_paciente") Paciente
-        select.form-control#id_paciente(name="id_paciente", required, onchange="mostrarDatosPaciente()")
-          option(value="") Seleccionar...
-          each paciente in pacientes
-            option(
-              value=paciente.id_paciente
-              data-dni=paciente.dni || ''
-              data-fnac=paciente.fecha_nacimiento || ''
-              data-tel=paciente.telefono || ''
-              data-os=paciente.obra_social || ''
-              data-naf=paciente.nro_afiliado || ''
-              selected=(String(datos.id_paciente) === String(paciente.id_paciente))
-            )= paciente.nombre + ' ' + paciente.apellido
+    .card.shadow-sm
+      .card-header.bg-primary.text-white
+        strong 📋 Admisión Administrativa / Programada
+      .card-body
+        form(method="POST" action="/admitir")
+            .row.g-3
+                //- 1. Selección de Paciente
+                .col-md-6
+                    label.form-label Paciente Registrado
+                    select.form-select#id_paciente(name="id_paciente" required onchange="mostrarDatosPaciente()")
+                        option(value="") -- Buscar por Nombre/DNI --
+                        each p in pacientes
+                            option(value=p.id_paciente data-dni=p.dni data-fnac=p.fecha_nacimiento data-tel=p.telefono) #{p.apellido}, #{p.nombre} (DNI: #{p.dni})
+                    
+                    //- Ficha técnica rápida (Visual feedback)
+                    div#datosPaciente.alert.alert-info.mt-2.d-none
+                        small
+                            strong DNI: 
+                            span#dp_dni -
+                            |  | 
+                            strong Nacimiento: 
+                            span#dp_fnac -
+                            |  | 
+                            strong Tel: 
+                            span#dp_tel -
 
-        a.btn.btn-link.mt-2(href="/pacientes/nuevo") + Crear nuevo paciente
+                //- 2. Cama Destino
+                .col-md-6
+                    label.form-label Cama Asignada
+                    select.form-select(name="id_cama_asignada" required)
+                        option(value="") -- Seleccionar Cama Libre --
+                        each cama in camas
+                           option(value=cama.id_cama)= `Cama ${cama.numero} (Hab. ${cama.habitacion_numero})`
 
-      #datosPaciente.mt-3(style="display: none;")
-        h5.text-primary Datos del paciente:
-        ul.list-group
-          li.list-group-item ID: #[span#dp_id]
-          li.list-group-item DNI: #[span#dp_dni]
-          li.list-group-item Fecha de nacimiento: #[span#dp_fnac]
-          li.list-group-item Teléfono: #[span#dp_tel]
-          li.list-group-item Obra Social: #[span#dp_os]
-          li.list-group-item Nº Afiliado: #[span#dp_naf]
+                //- 3. Tipo de Ingreso (El Selector Clave)
+                .col-md-4
+                    label.form-label Tipo de Ingreso
+                    select.form-select#select_tipo(name="tipo_ingreso" required onchange="cambiarFormulario()")
+                        option(value="consulta") Consulta / Guardia Común
+                        option(value="derivado") 🚑 Derivación (Traslado)
+                        option(value="quirurgico") 🔪 Quirúrgico / Programado
+                        option(value="emergencia") 🚨 Emergencia (Con DNI)
 
-      .mb-3
-        label.form-label(for="fecha_admision") Fecha de admisión
-        input.form-control(
-          type="date",
-          name="fecha_admision",
-          required,
-          value=datos.fecha_admision
-        )
+                .col-md-8
+                    label.form-label Motivo Principal
+                    input.form-control(type="text" name="motivo" required placeholder="Ej: Neumonía bilateral, Apendicitis...")
 
-      .mb-3
-        label.form-label(for="motivo") Motivo
-        textarea.form-control(
-          name="motivo",
-          rows="3",
-          required,
-          pattern=".{5,}",
-          title="Al menos 5 caracteres"
-        )= datos.motivo
+                //- --- CAMPOS LOGÍSTICOS CONTEXTUALES (Ocultos por defecto) ---
+                
+                //- A. Solo para Derivados
+                div#extra_derivado.col-12.d-none.p-3.bg-light.border.rounded
+                    label.form-label.fw-bold 🏥 Datos de Traslado (Logística)
+                    input.form-control(type="text" name="institucion_procedencia" placeholder="¿De qué hospital o clínica proviene? (Ej: Hospital Italiano)")
+                    small.text-muted * Requerido para gestionar el retorno o auditoría de traslado.
 
-      .mb-3
-        label.form-label(for="tipo_ingreso") Tipo de ingreso
-        select.form-control(name="tipo_ingreso", required)
-          option(value="", selected=!datos.tipo_ingreso) Seleccionar...
-          option(value="derivado", selected=datos.tipo_ingreso==='derivado') Derivado
-          option(value="emergencia", selected=datos.tipo_ingreso==='emergencia') Emergencia
-          option(value="quirurgico", selected=datos.tipo_ingreso==='quirurgico') Quirúrgico
+                //- B. Solo para Quirúrgicos
+                div#extra_quirurgico.col-12.d-none.p-3.bg-light.border.rounded
+                    label.form-label.fw-bold 🔪 Planificación Quirúrgica
+                    input.form-control(type="text" name="cirugia_programada" placeholder="Procedimiento a realizar (Ej: Colecistectomía Laparoscópica)")
+                    div.form-check.mt-2
+                        input.form-check-input(type="checkbox" id="ayuno")
+                        label.form-check-label(for="ayuno") Paciente cumple horas de ayuno pre-quirúrgico
 
-      .mb-3
-        label.form-label(for="id_cama_asignada") Cama disponible
-        select.form-control(name="id_cama_asignada", required)
-          option(value="", selected=!datos.id_cama_asignada) Seleccionar...
-          each cama in camas
-            option(
-              value=cama.id_cama,
-              selected=String(datos.id_cama_asignada)===String(cama.id_cama)
-            )= `Cama ${cama.numero} – Habitación ${cama.habitacion_numero}`
+            .d-grid.mt-4
+                button.btn.btn-primary.btn-lg(type="submit") 💾 Confirmar Internación
 
-      button.btn.btn-primary(type="submit") Registrar admisión
     br
-    a.btn.btn-secondary(href="/") Volver al inicio
+    a.btn.btn-link(href="/") Volver al inicio
 
+  //- Script para manejar la lógica visual
   script.
+    // Mostrar datos del paciente al seleccionar
     function mostrarDatosPaciente() {
       const select = document.getElementById('id_paciente');
       const selected = select.options[select.selectedIndex];
+      const divDatos = document.getElementById('datosPaciente');
 
       if (selected.value === '') {
-        document.getElementById('datosPaciente').style.display = 'none';
+        divDatos.classList.add('d-none');
         return;
       }
-
-      document.getElementById('dp_id').textContent   = selected.value;
+      divDatos.classList.remove('d-none');
       document.getElementById('dp_dni').textContent  = selected.dataset.dni || '-';
-
-     
-      let fnacRaw = selected.dataset.fnac;
-      if (fnacRaw) {
-        let d = new Date(fnacRaw);
-        let dd = String(d.getDate()).padStart(2,'0');
-        let mm = String(d.getMonth()+1).padStart(2,'0');
-        let yyyy = d.getFullYear();
-        document.getElementById('dp_fnac').textContent = `${dd}-${mm}-${yyyy}`;
-      } else {
-        document.getElementById('dp_fnac').textContent = '-';
-      }
-
+      // Formatear fecha
+      const d = new Date(selected.dataset.fnac);
+      document.getElementById('dp_fnac').textContent = d.toLocaleDateString();
       document.getElementById('dp_tel').textContent  = selected.dataset.tel || '-';
-      document.getElementById('dp_os').textContent   = selected.dataset.os || '-';
-      document.getElementById('dp_naf').textContent  = selected.dataset.naf || '-';
+    }
 
-      document.getElementById('datosPaciente').style.display = 'block';
+    // Lógica Contextual: Mostrar campos según el tipo
+    function cambiarFormulario() {
+        const tipo = document.getElementById('select_tipo').value;
+        const divDerivado = document.getElementById('extra_derivado');
+        const divQuirurgico = document.getElementById('extra_quirurgico');
+
+        // Resetear visibilidad
+        divDerivado.classList.add('d-none');
+        divQuirurgico.classList.add('d-none');
+        
+        // Limpiar inputs para no enviar basura si cambia de opinión
+        divDerivado.querySelector('input').value = '';
+        divQuirurgico.querySelector('input').value = '';
+
+        if (tipo === 'derivado') {
+            divDerivado.classList.remove('d-none');
+            divDerivado.querySelector('input').required = true; // Hacerlo obligatorio dinámicamente
+        } else if (tipo === 'quirurgico') {
+            divQuirurgico.classList.remove('d-none');
+            divQuirurgico.querySelector('input').required = true;
+        }
     }

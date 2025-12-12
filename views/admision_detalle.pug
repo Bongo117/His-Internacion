@@ -20,6 +20,19 @@ block content
             p #[strong Motivo:] #{admision.motivo}
             p #[strong Ubicación:] Habitación #{admision.habitacion_numero}, Cama #{admision.cama_numero}
 
+          //- Bloque Condicional de Logística
+          if admision.tipo_ingreso === 'derivado'
+            .col-12.mt-2
+                .alert.alert-warning.mb-0
+                    strong 🚑 Logística de Traslado:
+                    |  Paciente derivado desde #[strong= admision.institucion_procedencia]
+          
+          if admision.tipo_ingreso === 'quirurgico'
+            .col-12.mt-2
+                .alert.alert-info.mb-0
+                    strong 🔪 Procedimiento Programado:
+                    |  #{admision.cirugia_programada}
+
     //- Sección de Historial de Evoluciones
     h3.mb-3 Historial de Evoluciones
 

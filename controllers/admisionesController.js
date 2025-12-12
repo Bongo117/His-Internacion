@@ -38,7 +38,8 @@ module.exports = {
 
   // 2. Procesar la Admisión (POST) - ¡AQUÍ ESTÁ LA DEFENSA FUERTE!
   procesarAdmision: async (req, res) => {
-    const { id_paciente, fecha_admision, motivo, tipo_ingreso, id_cama_asignada } = req.body;
+    // 1. Recibimos los nuevos campos del body
+    const { id_paciente, id_cama_asignada, motivo, tipo_ingreso, institucion_procedencia, cirugia_programada } = req.body;
 
     let connection;
     try {
@@ -56,6 +57,11 @@ module.exports = {
       await connection.promise().beginTransaction();
 
       try {
+        // VALIDACIÓN: Si es quirúrgico, requerir el procedimiento
+        if (tipo_ingreso === 'quirurgico' && (!cirugia_programada || cirugia_programada.trim() === '')) {
+            throw new Error("Para ingresos quirúrgicos, debe especificar el procedimiento programado.");
+        }
+
         // 1. Validar: ¿El paciente ya está internado?
         const [admisionesActivas] = await connection.promise().query(
           "SELECT * FROM admision WHERE id_paciente = ? AND estado = 'activa'",
@@ -97,10 +103,21 @@ module.exports = {
             }
         }
 
-        // 2. Insertar la Admisión
-        const [result] = await connection.promise().query(
-          "INSERT INTO admision (id_paciente, fecha_admision, motivo, tipo_ingreso, id_cama_asignada) VALUES (?, ?, ?, ?, ?)",
-          [id_paciente, fecha_admision, motivo, tipo_ingreso, id_cama_asignada]
+        // 3. Inserción enriquecida
+        // DEFENSA: "El controlador se adapta polimórficamente. Si es una cirugía, guarda el procedimiento; 
+        // si es derivación, guarda el origen. Esto permite generar reportes logísticos precisos después."
+        await connection.promise().query(
+          `INSERT INTO admision 
+          (id_paciente, id_cama_asignada, fecha_admision, motivo, tipo_ingreso, estado, institucion_procedencia, cirugia_programada) 
+          VALUES (?, ?, NOW(), ?, ?, 'activa', ?, ?)`,
+          [
+            id_paciente, 
+            id_cama_asignada, 
+            motivo, 
+            tipo_ingreso, 
+            institucion_procedencia || null, 
+            cirugia_programada || null
+          ]
         );
 
         // 3. Actualizar estado de la Cama a 'Ocupada'
@@ -196,6 +213,7 @@ module.exports = {
       const sqlAdmision = `
         SELECT 
           a.id_admision, a.fecha_admision, a.motivo, a.tipo_ingreso, a.estado,
+          a.institucion_procedencia, a.cirugia_programada,
           p.nombre, p.apellido, p.dni, p.fecha_nacimiento, p.sexo,
           c.numero AS cama_numero,
           h.numero AS habitacion_numero
