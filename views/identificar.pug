@@ -3,133 +3,121 @@ extends layout
 block content
   .fondo-admisiones
   .contenido-box
-    h1= titulo
-    p.lead Estás a punto de fusionar la historia clínica de un paciente ingresado como NN.
+    h2.text-danger.mb-4 🆔 Fusión de Identidad
 
-    //- Si hay un error en el procesamiento, lo mostramos aquí
-    if error
-      .alert.alert-danger
-        strong Error: 
-        | #{error}
+    //- Advertencia
+    .alert.alert-warning.shadow-sm
+        h5 ⚠️ Fusión de Historia Clínica
+        p
+            | La admisión actual del paciente NN 
+            strong (ID: #{pacienteNN.id_admision}) 
+            | será transferida al paciente real que selecciones abajo.
 
-    .card.mb-4
-      .card-header
-        strong Datos de la Admisión Temporal (NN)
-      .card-body
-        p 
-          strong ID de Admisión: 
-          | #{pacienteNN.id_admision}
-        if pacienteNN.fecha_admision
-          p 
-            strong Fecha de Ingreso: 
-            | #{new Date(pacienteNN.fecha_admision).toLocaleString('es-AR')}
-          p 
-            strong Identificación Temporal: 
-            | #{pacienteNN.apellido}, #{pacienteNN.nombre} (DNI: #{pacienteNN.dni})
+    //- Datos del NN (Origen)
+    .card.mb-4.border-warning
+        .card-header.bg-warning.text-dark 
+            strong 👤 Paciente NN Actual
+        .card-body
+            ul.mb-0
+                li #[strong Nombre Temp:] #{pacienteNN.nombre} #{pacienteNN.apellido}
+                li #[strong DNI Temp:] #{pacienteNN.dni}
+                li #[strong Ingreso:] #{new Date(pacienteNN.fecha_admision).toLocaleString()}
 
     hr
 
-    h3.mb-3 Buscar y Asignar Paciente Real
-    p Introduce el DNI del paciente registrado para buscarlo y asignarle esta admisión.
+    h3.text-primary 🔎 Buscar Paciente Real (Destino)
+    
+    //- BUSCADOR INTERACTIVO
+    .mb-3.position-relative
+        label.form-label Escriba Nombre, Apellido o DNI:
+        input#buscador.form-control.form-control-lg(type="text" placeholder="Ej: Perez, Juan, o 33000..." autocomplete="off")
+        
+        //- Contenedor de resultados (se llena con JS)
+        div#listaResultados.list-group.mt-1.shadow(style="position: absolute; width: 100%; z-index: 1000; max-height: 200px; overflow-y: auto; display: none;")
 
-    //- Sección de Búsqueda
-    .row.g-3.align-items-end.mb-3
-      .col-md-8
-        label.form-label(for="dni_busqueda") 
-          strong Buscar Paciente por DNI
-        input.form-control.form-control-lg(type="text", id="dni_busqueda", placeholder="Escriba un DNI para buscar...", autofocus)
-      .col-md-4
-        button.btn.btn-info.w-100(type="button" id="btn_buscar_paciente")
-          i.bi.bi-search.me-2
-          | Buscar Paciente
-
-    //- Contenedor para los resultados de la búsqueda
-    #resultados_busqueda.list-group.mb-3
-
-    //- Formulario principal que se enviará
-    form(method="POST" action="/admisiones/identificar" id="form_identificar")
-      input(type="hidden" name="id_admision" value=pacienteNN.id_admision)
-      //- Este input se llenará con JS al seleccionar un paciente
-      input(type="hidden" name="dni_real" id="dni_real")
-
-      //- Muestra el paciente seleccionado antes de confirmar
-      #paciente_seleccionado.card.bg-light.p-3.d-none.mb-3
-        h5.card-title Paciente Seleccionado
-        p.card-text
-          | Se transferirá la admisión a: 
-          strong#nombre_paciente_seleccionado
-        small.text-muted DNI: 
-          span#dni_paciente_seleccionado
-
-      .d-flex.justify-content-between.mt-4
-        a.btn.btn-secondary(href="/admisiones") Cancelar
-        //- El botón de confirmar empieza deshabilitado
-        button.btn.btn-primary.fw-bold(type="submit" id="btn_confirmar" disabled) 
-          i.bi.bi-check-circle-fill.me-2
-          | Confirmar y Fusionar
-
-block scripts
-  script.
-    document.addEventListener('DOMContentLoaded', () => {
-      const btnBuscar = document.getElementById('btn_buscar_paciente');
-      const inputBusqueda = document.getElementById('dni_busqueda');
-      const resultadosDiv = document.getElementById('resultados_busqueda');
-      const inputDniReal = document.getElementById('dni_real');
-      const btnConfirmar = document.getElementById('btn_confirmar');
-      const divPacienteSeleccionado = document.getElementById('paciente_seleccionado');
-      const nombrePacienteSpan = document.getElementById('nombre_paciente_seleccionado');
-      const dniPacienteSpan = document.getElementById('dni_paciente_seleccionado');
-
-      const buscarPacientes = async () => {
-        const dni = inputBusqueda.value.trim();
-        if (!dni) {
-          resultadosDiv.innerHTML = '<div class="list-group-item list-group-item-warning">Por favor, ingrese un DNI para buscar.</div>';
-          return;
-        }
-
-        const response = await fetch(`/pacientes/api/buscar/${dni}`);
-        const pacientes = await response.json();
-
-        resultadosDiv.innerHTML = ''; // Limpiar resultados anteriores
-        if (pacientes.length > 0) {
-          pacientes.forEach(p => {
-            const item = document.createElement('a');
-            item.href = '#';
-            item.className = 'list-group-item list-group-item-action';
-            item.textContent = `${p.apellido}, ${p.nombre} (DNI: ${p.dni})`;
-            item.dataset.dni = p.dni;
-            item.dataset.nombre = `${p.apellido}, ${p.nombre}`;
+    //- FORMULARIO FINAL (Se muestra al seleccionar)
+    #confirmacion.card.border-success.d-none
+        .card-header.bg-success.text-white
+            strong ✅ Paciente Seleccionado
+        .card-body.text-center
+            h3#nombreSeleccionado.text-success
+            p.text-muted DNI: #[span#dniSeleccionado]
             
-            item.addEventListener('click', (e) => {
-              e.preventDefault();
-              inputDniReal.value = item.dataset.dni;
-              nombrePacienteSpan.textContent = item.dataset.nombre;
-              dniPacienteSpan.textContent = item.dataset.dni;
-              divPacienteSeleccionado.classList.remove('d-none');
-              btnConfirmar.disabled = false;
-              resultadosDiv.innerHTML = '';
-              inputBusqueda.value = '';
-              inputBusqueda.focus();
-            });
-            resultadosDiv.appendChild(item);
-          });
-        } else {
-          resultadosDiv.innerHTML = '<div class="list-group-item list-group-item-danger">No se encontraron pacientes con ese DNI.</div>';
-        }
-      };
+            //- Formulario principal que se enviará
+            //- CAMBIO: action debe ser "/identificar" (sin /admisiones)
+            form(method="POST" action="/identificar" id="form_identificar")
+                input(type="hidden" name="id_admision" value=pacienteNN.id_admision)
+                input#inputDniReal(type="hidden" name="dni_real")
+                
+                button.btn.btn-success.btn-lg.w-100(type="submit", onclick="return confirm('¿CONFIRMA LA FUSIÓN? Esta acción es irreversible.')") 
+                    | 🔄 CONFIRMAR FUSIÓN
 
-      btnBuscar.addEventListener('click', buscarPacientes);
-      inputBusqueda.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault(); // Evita que el formulario se envíe si está dentro de uno
-          buscarPacientes();
-        }
-      });
+  //- SCRIPT DEL CLIENTE (AJAX)
+  script.
+    const inputBuscador = document.getElementById('buscador');
+    const listaResultados = document.getElementById('listaResultados');
+    const panelConfirmacion = document.getElementById('confirmacion');
+    const nombreSel = document.getElementById('nombreSeleccionado');
+    const dniSel = document.getElementById('dniSeleccionado');
+    const inputHidden = document.getElementById('inputDniReal');
 
-      document.getElementById('form_identificar').addEventListener('submit', (e) => {
-        if (!inputDniReal.value) {
-          e.preventDefault();
-          alert('Debe buscar y seleccionar un paciente antes de confirmar.');
+    // Escuchar cuando el usuario escribe
+    inputBuscador.addEventListener('input', async (e) => {
+        const termino = e.target.value;
+
+        if (termino.length < 2) { // Buscar solo si hay 2+ letras
+            listaResultados.style.display = 'none';
+            return;
         }
-      });
+
+        // Llamada AJAX al Backend
+        try {
+            const res = await fetch(`/pacientes/api/smart-search?termino=${termino}`);
+            const pacientes = await res.json();
+
+            // Limpiar lista vieja
+            listaResultados.innerHTML = '';
+
+            if (pacientes.length === 0) {
+                listaResultados.innerHTML = '<div class="list-group-item">No se encontraron resultados.</div>';
+            } else {
+                // Dibujar cada paciente encontrado
+                pacientes.forEach(p => {
+                    const item = document.createElement('button');
+                    item.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center';
+                    item.innerHTML = `
+                        <div>
+                            <strong>${p.apellido}, ${p.nombre}</strong>
+                            <br><small class="text-muted">DNI: ${p.dni}</small>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">Seleccionar</span>
+                    `;
+                    
+                    // Al hacer clic en un paciente
+                    item.onclick = () => {
+                        seleccionarPaciente(p);
+                    };
+
+                    listaResultados.appendChild(item);
+                });
+            }
+            listaResultados.style.display = 'block';
+
+        } catch (error) {
+            console.error('Error buscando:', error);
+        }
     });
+
+    function seleccionarPaciente(p) {
+        // 1. Ocultar lista
+        listaResultados.style.display = 'none';
+        inputBuscador.value = ''; // Limpiar buscador
+
+        // 2. Llenar la tarjeta de confirmación
+        nombreSel.textContent = `${p.apellido}, ${p.nombre}`;
+        dniSel.textContent = p.dni;
+        inputHidden.value = p.dni; // <--- ESTO ES LO QUE SE ENVÍA AL SERVER
+
+        // 3. Mostrar confirmación
+        panelConfirmacion.classList.remove('d-none');
+    }

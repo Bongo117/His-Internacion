@@ -31,4 +31,7 @@ router.post("/eliminar/:id", pacientesController.eliminarPaciente);
  
 router.get("/:id/admisiones", pacientesController.listarAdmisionesDePaciente);
 
+// Nueva ruta de búsqueda inteligente (acepta ?termino=...)
+router.get("/api/smart-search", pacientesController.buscarPacientesFlexible);
+
 module.exports = router;

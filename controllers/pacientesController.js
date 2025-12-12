@@ -108,6 +108,32 @@ module.exports = {
     }
   },
 
+  // --- API DE BÚSQUEDA FLEXIBLE (AJAX) ---
+  buscarPacientesFlexible: async (req, res) => {
+    const { termino } = req.query; // Recibimos ?termino=algo
+
+    if (!termino) return res.json([]);
+
+    try {
+      // Buscamos coincidencias en DNI, Nombre o Apellido usando LIKE
+      // El '%' permite buscar pedazos de texto
+      const sql = `
+        SELECT id_paciente, nombre, apellido, dni, fecha_nacimiento 
+        FROM paciente 
+        WHERE dni LIKE ? OR nombre LIKE ? OR apellido LIKE ? 
+        LIMIT 5`;
+      
+      const param = `%${termino}%`;
+
+      const [resultados] = await db.promise().query(sql, [param, param, param]);
+      
+      res.json(resultados); // Devolvemos un Array de pacientes
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Error en búsqueda" });
+    }
+  },
+
   mostrarFormularioEditar: async (req, res) => {
     const { id } = req.params;
     let connection;

@@ -43,7 +43,8 @@ block content
                 if admision.estado === 'activa'
                   //- Si es NN, la acción principal es Identificar
                   if esNN
-                    a.btn.btn-danger.btn-sm.w-100.fw-bold(href=`/admisiones/identificar/${admision.id_admision}`) 
+                    //- CAMBIO: href apunta a "/identificar/..."
+                    a.btn.btn-danger.btn-sm.w-100.fw-bold(href=`/identificar/${admision.id_admision}`) 
                       i.bi.bi-person-vcard.me-1
                       | IDENTIFICAR
                   

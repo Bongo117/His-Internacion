@@ -28,10 +28,10 @@ router.post("/admisiones/:id/cancelar", tieneRol(['admin']), admisionesControlle
 router.post("/admitir/emergencia", tieneRol(['medico', 'enfermero', 'admin']), admisionesController.ingresoEmergencia);
 
 // Rutas para Identificar Pacientes NN
-// GET: Muestra el formulario (requiere ID de la admisión)
-router.get("/admisiones/identificar/:id_admision", tieneRol(['medico', 'enfermero', 'admin']), admisionesController.formularioIdentificar);
+// CAMBIO: Quitamos "/admisiones" del principio
+router.get("/identificar/:id_admision", tieneRol(['medico', 'enfermero', 'admin']), admisionesController.formularioIdentificar);
 
-// POST: Procesa el cambio
-router.post("/admisiones/identificar", tieneRol(['medico', 'enfermero', 'admin']), admisionesController.procesarIdentificacion);
+// CAMBIO: Quitamos "/admisiones" del principio para que coincida con el POST del formulario
+router.post("/identificar", tieneRol(['medico', 'enfermero', 'admin']), admisionesController.procesarIdentificacion);
 
 module.exports = router;
