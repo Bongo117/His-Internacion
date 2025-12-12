@@ -19,6 +19,9 @@ router.post("/admitir", tieneRol(['recepcionista', 'enfermero', 'admin']), admis
 // Listar admisiones (Todos pueden ver)
 router.get("/admisiones", admisionesController.listarAdmisiones);
 
+// Ver detalle de admisión
+router.get("/admisiones/:id/detalle", estaLogueado, admisionesController.verDetalleAdmision);
+
 // Acciones de cierre (Solo admin o enfermero)
 router.post("/admisiones/:id/finalizar", tieneRol(['enfermero', 'admin']), admisionesController.finalizarAdmision);
 router.post("/admisiones/:id/cancelar", tieneRol(['admin']), admisionesController.cancelarAdmision);

@@ -27,7 +27,7 @@ block content
       each evo in evoluciones
         .card.mb-3
           .card-header.d-flex.justify-content-between
-            span #[strong Fecha:] #{new Date(evo.fecha_evaluacion).toLocaleString('es-AR')}
+            span #[strong Fecha:] #{new Date(evo.fecha).toLocaleString('es-AR')}
             span #[strong Médico:] #{evo.medico_responsable}
           .card-body
             h5.card-title.text-primary Diagnóstico / Evolución
@@ -36,20 +36,6 @@ block content
             h5.card-title.text-primary Tratamiento / Indicaciones
             p.card-text.bg-light.p-2.rounded= evo.tratamientos
 
-            //- Signos Vitales
-            h6.mt-3 Signos Vitales
-            .row
-              .col-sm-4.col-md-2
-                p.mb-1 #[strong PA:] #{evo.presion_arterial || 'N/A'}
-              .col-sm-4.col-md-2
-                p.mb-1 #[strong T°:] #{evo.temperatura ? evo.temperatura + '°C' : 'N/A'}
-              .col-sm-4.col-md-2
-                p.mb-1 #[strong FC:] #{evo.frec_cardiaca ? evo.frec_cardiaca + ' lpm' : 'N/A'}
-              .col-sm-6.col-md-3
-                p.mb-1 #[strong FR:] #{evo.frec_respiratoria ? evo.frec_respiratoria + ' rpm' : 'N/A'}
-              .col-sm-6.col-md-3
-                p.mb-1 #[strong Sat O₂:] #{evo.saturacion_o2 ? evo.saturacion_o2 + '%' : 'N/A'}
-            
             if evo.alta
               .alert.alert-success.mt-3.py-2
                 strong 🏥 ALTA MÉDICA OTORGADA EN ESTA EVOLUCIÓN

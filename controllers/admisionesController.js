@@ -192,7 +192,7 @@ module.exports = {
         });
       });
 
-      // Query para los datos principales de la admisión
+      // 1. Datos principales de la admisión
       const sqlAdmision = `
         SELECT 
           a.id_admision, a.fecha_admision, a.motivo, a.tipo_ingreso, a.estado,
@@ -206,16 +206,19 @@ module.exports = {
         WHERE a.id_admision = ?
       `;
 
-      // Query para el historial de evoluciones
+      // 2. Historial de evoluciones (CORREGIDO)
+      // Usamos 'fecha' en lugar de 'fecha_evaluacion' y quitamos los signos vitales que no existen
       const sqlEvoluciones = `
         SELECT
-          em.fecha_evaluacion, em.diagnostico, em.tratamientos, em.alta,
-          em.presion_arterial, em.temperatura, em.frec_cardiaca, em.frec_respiratoria, em.saturacion_o2,
+          em.fecha,  
+          em.diagnostico, 
+          em.tratamientos, 
+          em.alta,
           u.username AS medico_responsable
         FROM evaluacion_medica em
         JOIN usuario u ON em.medico_responsable = u.id_usuario
         WHERE em.id_admision = ?
-        ORDER BY em.fecha_evaluacion DESC
+        ORDER BY em.fecha DESC
       `;
 
       const [admisionResult, evolucionesResult] = await Promise.all([
